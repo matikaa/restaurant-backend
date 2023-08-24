@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
@@ -38,6 +39,10 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryRequestResponse> addCategory(@RequestBody CategoryRequest categoryRequest) {
+        if(categoryService.existsByPositionId(categoryRequest.positionId())) {
+            return ResponseEntity.status(BAD_REQUEST).build();
+        }
+
         return Optional.ofNullable(categoryRequest)
                 .map(categoryService::insert)
                 .map(categoryControllerMapper::categoryToCategoryRequestResponse)
