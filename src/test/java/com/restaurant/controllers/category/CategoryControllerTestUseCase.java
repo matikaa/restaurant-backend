@@ -1,6 +1,8 @@
 package com.restaurant.controllers.category;
 
 import com.restaurant.app.category.controller.dto.CategoryListResponse;
+import com.restaurant.app.category.controller.dto.CategoryRequest;
+import com.restaurant.app.category.controller.dto.CategoryRequestResponse;
 import com.restaurant.app.category.controller.dto.CategoryResponse;
 import com.restaurant.controllers.TestUseCase;
 import org.junit.jupiter.api.DisplayName;
@@ -9,8 +11,7 @@ import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 public class CategoryControllerTestUseCase extends TestUseCase {
 
@@ -20,8 +21,9 @@ public class CategoryControllerTestUseCase extends TestUseCase {
         //given
         var categoryName = "Juices";
         var secCategoryName = "Soups";
-        createCategory(categoryName);
-        createCategory(secCategoryName);
+        var secPositionId = 13L;
+        createCategory(categoryName, POSITION_ID);
+        createCategory(secCategoryName, secPositionId);
 
         //when
         var getCategoryResponse = client.getForEntity(
@@ -34,7 +36,9 @@ public class CategoryControllerTestUseCase extends TestUseCase {
         assertThat(getCategoryResponse.getBody(), is(not(nullValue())));
         assertThat(getCategoryResponse.getBody().categoryResponses().size(), equalTo(2));
         assertThat(getCategoryResponse.getBody().categoryResponses().get(0).categoryName(), equalTo(categoryName));
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(0).positionId(), equalTo(POSITION_ID));
         assertThat(getCategoryResponse.getBody().categoryResponses().get(1).categoryName(), equalTo(secCategoryName));
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(1).positionId(), equalTo(secPositionId));
     }
 
     @Test
@@ -42,7 +46,7 @@ public class CategoryControllerTestUseCase extends TestUseCase {
     void shouldGetCategory() {
         //given
         var categoryName = "Starters";
-        var createdCategory = createCategory(categoryName);
+        var createdCategory = createCategory(categoryName, POSITION_ID);
 
         //when
         var getCategoryResponse = client.getForEntity(
@@ -54,6 +58,39 @@ public class CategoryControllerTestUseCase extends TestUseCase {
         assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
         assertThat(getCategoryResponse.getBody(), is(not(nullValue())));
         assertThat(getCategoryResponse.getBody().categoryName(), equalTo(categoryName));
+        assertThat(getCategoryResponse.getBody().positionId(), equalTo(POSITION_ID));
+    }
+
+    @Test
+    @DisplayName("Should not add category by existing positionId and return 400 BAD REQUEST")
+    void shouldNotAddCategory() {
+        //given
+        var categoryName = "Starters";
+        var secCategoryName = "Coffees";
+        var createdCategory = createCategory(categoryName, POSITION_ID);
+        var createSecCategoryRequest = new CategoryRequest(POSITION_ID, secCategoryName);
+
+        //when
+        var getCategoryResponse = client.getForEntity(
+                categoryPath(createdCategory.categoryId()),
+                CategoryResponse.class
+        );
+
+        //then
+        assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
+        assertThat(getCategoryResponse.getBody(), is(not(nullValue())));
+        assertThat(getCategoryResponse.getBody().categoryName(), equalTo(categoryName));
+        assertThat(getCategoryResponse.getBody().positionId(), equalTo(POSITION_ID));
+
+        //when
+        var createCategoryResponse = client.postForEntity(
+                prepareUrl(CATEGORY_RESOURCE),
+                createSecCategoryRequest,
+                CategoryRequestResponse.class
+        );
+
+        //then
+        assertThat(createCategoryResponse.getStatusCode(), equalTo(BAD_REQUEST));
     }
 
     @Test
@@ -61,7 +98,7 @@ public class CategoryControllerTestUseCase extends TestUseCase {
     void shouldNotGetCategory() {
         //given
         var categoryName = "Cocktails";
-        createCategory(categoryName);
+        createCategory(categoryName, POSITION_ID);
 
         //when
         var getCategoryResponse = client.getForEntity(
@@ -78,7 +115,7 @@ public class CategoryControllerTestUseCase extends TestUseCase {
     void shouldDeleteCategoryById() {
         //given
         var categoryName = "Desserts";
-        var createdCategory = createCategory(categoryName);
+        var createdCategory = createCategory(categoryName, POSITION_ID);
 
         //when
         var getCategoryResponse = client.getForEntity(
@@ -111,7 +148,7 @@ public class CategoryControllerTestUseCase extends TestUseCase {
     void shouldNotDeleteCategoryByWrongId() {
         //given
         var categoryName = "Desserts";
-        var createdCategory = createCategory(categoryName);
+        var createdCategory = createCategory(categoryName, POSITION_ID);
 
         //when
         var getCategoryResponse = client.getForEntity(
@@ -145,11 +182,11 @@ public class CategoryControllerTestUseCase extends TestUseCase {
     @DisplayName("Should update category by Id and return 200 OK")
     void shouldUpdateCategoryById() {
         //given
-        var positionId = 4L;
         var categoryName = "Drinks";
         var secCategoryName = "Salads";
-        var createdCategory = createCategory(categoryName);
-        var updatedCategory = getUpdatedCategoryRequest(positionId, secCategoryName);
+        var secPositionId = 4L;
+        var createdCategory = createCategory(categoryName, POSITION_ID);
+        var updatedCategory = getUpdatedCategoryRequest(secPositionId, secCategoryName);
 
         //when
         var getCategoryResponse = client.getForEntity(
@@ -178,18 +215,18 @@ public class CategoryControllerTestUseCase extends TestUseCase {
         //then
         assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
         assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(secCategoryName)));
-        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(positionId)));
+        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(secPositionId)));
     }
 
     @Test
     @DisplayName("Should not update category by wrong Id and return 404 NOT FOUND")
     void shouldNotUpdateCategoryByWrongId() {
         //given
-        var positionId = 4L;
         var categoryName = "Main Courses";
         var secCategoryName = "Entrees";
-        var createdCategory = createCategory(categoryName);
-        var updatedCategory = getUpdatedCategoryRequest(positionId, secCategoryName);
+        var secPositionId = 4L;
+        var createdCategory = createCategory(categoryName, POSITION_ID);
+        var updatedCategory = getUpdatedCategoryRequest(secPositionId, secCategoryName);
 
         //when
         var getCategoryResponse = client.getForEntity(

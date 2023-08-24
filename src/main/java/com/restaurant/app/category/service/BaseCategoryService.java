@@ -48,4 +48,10 @@ public class BaseCategoryService implements CategoryService{
     public boolean existsById(Long categoryId) {
         return categoryRepository.exists(categoryId);
     }
+
+    @Override
+    public boolean existsByPositionId(Long positionId) {
+        return categoryServiceMapper.categoryModelsToCategories(categoryRepository.findAll())
+                .stream().anyMatch(category -> category.positionId().equals(positionId));
+    }
 }

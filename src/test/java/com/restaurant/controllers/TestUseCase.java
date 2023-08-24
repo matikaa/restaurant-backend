@@ -31,9 +31,9 @@ public class TestUseCase {
     public static final Long POSITION_ID = 1L;
     public static final Long WRONG_CATEGORY_ID = -1L;
 
-    protected CategoryRequestResponse createCategory(String categoryName) {
+    protected CategoryRequestResponse createCategory(String categoryName, Long positionId) {
         //given
-        var createCategoryRequest = new CategoryRequest(POSITION_ID, categoryName);
+        var createCategoryRequest = new CategoryRequest(positionId, categoryName);
 
         //when
         var createCategoryResponse = client.postForEntity(
