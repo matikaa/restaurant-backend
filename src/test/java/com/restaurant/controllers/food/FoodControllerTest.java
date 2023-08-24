@@ -21,27 +21,27 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Side Dishes";
         var categoryPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Sauce";
         var foodPositionId = 2L;
         var foodPrice = 45;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );
-
+        System.out.println("\n\n" + foodResponse.getBody() + "\n\n");
         //then
         assertThat(foodResponse.getStatusCode(), is(equalTo(CREATED)));
         assertThat(foodResponse.getBody(), is(notNullValue()));
         assertThat(foodResponse.getBody().foodName(), is(equalTo(foodName)));
         assertThat(foodResponse.getBody().foodPrice(), is(equalTo(foodPrice)));
         assertThat(foodResponse.getBody().positionId(), is(equalTo(foodPositionId)));
-        assertThat(foodResponse.getBody().categoryId(), is(equalTo(createdCategory.categoryId())));
+        assertThat(foodResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
     }
 
     @Test
@@ -50,20 +50,20 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Drinks";
         var categoryPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Mojito";
         var foodPositionId = 2L;
         var foodPrice = 45;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var secondFoodName = "Sex on the beach";
         var secondFoodPrice = 38;
-        var invalidFoodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, secondFoodName, secondFoodPrice);
+        var invalidFoodRequest = createFoodRequest(foodPositionId, secondFoodName, secondFoodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -74,11 +74,11 @@ class FoodControllerTest extends TestUseCase {
         assertThat(foodResponse.getBody().foodName(), is(equalTo(foodName)));
         assertThat(foodResponse.getBody().foodPrice(), is(equalTo(foodPrice)));
         assertThat(foodResponse.getBody().positionId(), is(equalTo(foodPositionId)));
-        assertThat(foodResponse.getBody().categoryId(), is(equalTo(createdCategory.categoryId())));
+        assertThat(foodResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
 
         //when
         foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 invalidFoodRequest,
                 FoodRequestResponse.class
         );
@@ -88,17 +88,17 @@ class FoodControllerTest extends TestUseCase {
     }
 
     @Test
-    @DisplayName("Should not add food by lack of categoryId and return 404 NOT FOUND")
-    void shouldNotAddFoodByLackOfCategoryIdAndReturnNotFound() {
+    @DisplayName("Should not add food by wrong categoryId and return 404 NOT FOUND")
+    void shouldNotAddFoodByWrongCategoryIdAndReturnNotFound() {
         //given
         var foodName = "Grilled Steak";
         var foodPositionId = 1L;
         var foodPrice = 34;
-        var foodRequest = createFoodRequest(WRONG_CATEGORY_ID, foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(WRONG_CATEGORY_ID),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -113,16 +113,16 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Specials of the Day";
         var categoryPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Roast Chicken";
         var foodPositionId = 2L;
         var foodPrice = 45;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -134,7 +134,7 @@ class FoodControllerTest extends TestUseCase {
         //when
         var foodRequestResponse = client.getForEntity(
                 prepareFoodUrlWithFoodId(
-                        createdCategory.categoryId(), foodResponse.getBody().foodId()),
+                        savedCategory.categoryId(), foodResponse.getBody().foodId()),
                 FoodRequestResponse.class
         );
 
@@ -152,16 +152,16 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Desserts";
         var categoryPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Ice Cream";
         var foodPositionId = 2L;
         var foodPrice = 45;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -187,16 +187,16 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Entrees";
         var categoryPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Caesar Salad";
         var foodPositionId = 2L;
         var foodPrice = 45;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -222,11 +222,11 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Kid's menu";
         var categoryPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         //when
         var foodListResponse = client.getForEntity(
-                prepareFoodUrlWithCategoryId(createdCategory.categoryId()),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 FoodListResponse.class
         );
 
@@ -242,30 +242,30 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Fishes";
         var categoryPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var categoryName2 = "Desserts";
         var categoryPositionId2 = 5L;
-        var createdCategory2 = saveCategory(categoryName2, categoryPositionId2);
+        var savedCategory2 = saveCategory(categoryName2, categoryPositionId2);
 
         var foodName = "Fillet";
         var foodPositionId = 1L;
         var foodPrice = 45;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var foodName2 = "Tomato spaghetti";
         var foodPositionId2 = 2L;
         var foodPrice2 = 27;
-        var foodRequest2 = createFoodRequest(createdCategory.categoryId(), foodPositionId2, foodName2, foodPrice2);
+        var foodRequest2 = createFoodRequest(foodPositionId2, foodName2, foodPrice2);
 
         var foodName3 = "Lasagna";
         var foodPositionId3 = 1L;
         var foodPrice3 = 21;
-        var foodRequest3 = createFoodRequest(createdCategory2.categoryId(), foodPositionId3, foodName3, foodPrice3);
+        var foodRequest3 = createFoodRequest(foodPositionId3, foodName3, foodPrice3);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -276,7 +276,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodResponse2 = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest2,
                 FoodRequestResponse.class
         );
@@ -287,7 +287,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodResponse3 = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory2.categoryId()),
                 foodRequest3,
                 FoodRequestResponse.class
         );
@@ -298,19 +298,19 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodRequestResponse = client.getForEntity(
-                prepareFoodUrlWithCategoryId(createdCategory.categoryId()),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 FoodListResponse.class
         );
 
         //then
         assertThat(foodRequestResponse.getStatusCode(), is(equalTo(OK)));
         assertThat(foodRequestResponse.getBody(), is(notNullValue()));
-        assertThat(foodRequestResponse.getBody().foodResponses().get(0).categoryId(), is(createdCategory.categoryId()));
+        assertThat(foodRequestResponse.getBody().foodResponses().get(0).categoryId(), is(savedCategory.categoryId()));
         assertThat(foodRequestResponse.getBody().foodResponses().get(0).positionId(), is(foodRequest.positionId()));
         assertThat(foodRequestResponse.getBody().foodResponses().get(0).foodName(), is(foodRequest.foodName()));
         assertThat(foodRequestResponse.getBody().foodResponses().get(0).foodPrice(), is(foodRequest.foodPrice()));
 
-        assertThat(foodRequestResponse.getBody().foodResponses().get(1).categoryId(), is(createdCategory.categoryId()));
+        assertThat(foodRequestResponse.getBody().foodResponses().get(1).categoryId(), is(savedCategory.categoryId()));
         assertThat(foodRequestResponse.getBody().foodResponses().get(1).positionId(), is(foodRequest2.positionId()));
         assertThat(foodRequestResponse.getBody().foodResponses().get(1).foodName(), is(foodRequest2.foodName()));
         assertThat(foodRequestResponse.getBody().foodResponses().get(1).foodPrice(), is(foodRequest2.foodPrice()));
@@ -322,18 +322,18 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Soups";
         var categoryPositionId = 3L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Tomato soup";
         var foodPositionId = 2L;
         var foodPrice = 24;
-        var savedFood = saveFood(createdCategory.categoryId(), foodName, foodPrice, foodPositionId);
+        var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
 
         //when
-        client.delete(prepareFoodUrlWithFoodId(createdCategory.categoryId(), savedFood.foodId()));
+        client.delete(prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()));
 
         var contactDeleted = client.getForEntity(
-                prepareFoodUrlWithFoodId(createdCategory.categoryId(), savedFood.foodId()),
+                prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()),
                 FoodRequestResponse.class
         );
 
@@ -347,20 +347,20 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Soups";
         var categoryPositionId = 3L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Tomato soup";
         var foodPositionId = 2L;
         var foodPrice = 24;
-        var savedFood = saveFood(createdCategory.categoryId(), foodName, foodPrice, foodPositionId);
+        var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
 
         var incorrectFoodId = -1L;
 
         //when
-        client.delete(prepareFoodUrlWithFoodId(createdCategory.categoryId(), incorrectFoodId));
+        client.delete(prepareFoodUrlWithFoodId(savedCategory.categoryId(), incorrectFoodId));
 
         var contactDeleted = client.getForEntity(
-                prepareFoodUrlWithFoodId(createdCategory.categoryId(), savedFood.foodId()),
+                prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()),
                 FoodRequestResponse.class
         );
 
@@ -375,20 +375,20 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Teas";
         var categoryPositionId = 6L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Earl grey";
         var foodPositionId = 1L;
         var foodPrice = 15;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var secPositionId = 3L;
         var secFoodPrice = 63;
-        var updateFoodRequest = createFoodRequest(createdCategory.categoryId(), secPositionId, foodName, secFoodPrice);
+        var updateFoodRequest = createFoodRequestUpdate(savedCategory.categoryId(), secPositionId, foodName, secFoodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -399,7 +399,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var updatedFoodResponse = client.exchange(
-                prepareFoodUrlWithFoodId(createdCategory.categoryId(),
+                prepareFoodUrlWithFoodId(savedCategory.categoryId(),
                         foodResponse.getBody().foodId()),
                 PUT,
                 createBody(updateFoodRequest),
@@ -417,7 +417,7 @@ class FoodControllerTest extends TestUseCase {
         //when
         var foodRequestResponse = client.getForEntity(
                 prepareFoodUrlWithFoodId(
-                        createdCategory.categoryId(),
+                        savedCategory.categoryId(),
                         foodResponse.getBody().foodId()),
                 FoodRequestResponse.class
         );
@@ -435,20 +435,20 @@ class FoodControllerTest extends TestUseCase {
         //given
         var categoryName = "Coffees";
         var categoryPositionId = 2L;
-        var createdCategory = saveCategory(categoryName, categoryPositionId);
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
 
         var foodName = "Cappuccino";
         var foodPositionId = 5L;
         var foodPrice = 6;
-        var foodRequest = createFoodRequest(createdCategory.categoryId(), foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var secPositionId = 2L;
         var secFoodPrice = 15;
-        var updateFoodRequest = createFoodRequest(createdCategory.categoryId(), secPositionId, foodName, secFoodPrice);
+        var updateFoodRequest = createFoodRequestUpdate(savedCategory.categoryId(), secPositionId, foodName, secFoodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
                 foodRequest,
                 FoodRequestResponse.class
         );

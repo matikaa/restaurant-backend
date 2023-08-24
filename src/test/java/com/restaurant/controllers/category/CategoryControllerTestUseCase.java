@@ -22,8 +22,8 @@ class CategoryControllerTestUseCase extends TestUseCase {
         var categoryName = "Juices";
         var secCategoryName = "Soups";
         var secPositionId = 13L;
-        saveCategory(categoryName, POSITION_ID);
-        saveCategory(secCategoryName, secPositionId);
+        var savedCategory = saveCategory(categoryName, POSITION_ID);
+        var secSavedCategory = saveCategory(secCategoryName, secPositionId);
 
         //when
         var getCategoryResponse = client.getForEntity(
@@ -32,13 +32,16 @@ class CategoryControllerTestUseCase extends TestUseCase {
         );
 
         //then
-        assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
+        assertThat(getCategoryResponse.getStatusCode(), is(equalTo(OK)));
         assertThat(getCategoryResponse.getBody(), is(not(nullValue())));
-        assertThat(getCategoryResponse.getBody().categoryResponses().size(), equalTo(2));
-        assertThat(getCategoryResponse.getBody().categoryResponses().get(0).categoryName(), equalTo(categoryName));
-        assertThat(getCategoryResponse.getBody().categoryResponses().get(0).positionId(), equalTo(POSITION_ID));
-        assertThat(getCategoryResponse.getBody().categoryResponses().get(1).categoryName(), equalTo(secCategoryName));
-        assertThat(getCategoryResponse.getBody().categoryResponses().get(1).positionId(), equalTo(secPositionId));
+        assertThat(getCategoryResponse.getBody().categoryResponses().size(), is(equalTo(2)));
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(0).categoryName(), is(equalTo(categoryName)));
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(0).positionId(), is(equalTo(POSITION_ID)));
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(0).categoryId(), is(equalTo(savedCategory.categoryId())));
+
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(1).categoryName(), is(equalTo(secCategoryName)));
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(1).positionId(), is(equalTo(secPositionId)));
+        assertThat(getCategoryResponse.getBody().categoryResponses().get(1).categoryId(), is(equalTo(secSavedCategory.categoryId())));
     }
 
     @Test
@@ -46,19 +49,20 @@ class CategoryControllerTestUseCase extends TestUseCase {
     void shouldGetCategory() {
         //given
         var categoryName = "Starters";
-        var createdCategory = saveCategory(categoryName, POSITION_ID);
+        var savedCategory = saveCategory(categoryName, POSITION_ID);
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         //then
-        assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
+        assertThat(getCategoryResponse.getStatusCode(), is(equalTo(OK)));
         assertThat(getCategoryResponse.getBody(), is(not(nullValue())));
-        assertThat(getCategoryResponse.getBody().categoryName(), equalTo(categoryName));
-        assertThat(getCategoryResponse.getBody().positionId(), equalTo(POSITION_ID));
+        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(categoryName)));
+        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(POSITION_ID)));
+        assertThat(getCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
     }
 
     @Test
@@ -67,12 +71,12 @@ class CategoryControllerTestUseCase extends TestUseCase {
         //given
         var categoryName = "Starters";
         var secCategoryName = "Coffees";
-        var createdCategory = saveCategory(categoryName, POSITION_ID);
-        var createSecCategoryRequest = new CategoryRequest(POSITION_ID, secCategoryName);
+        var savedCategory = saveCategory(categoryName, POSITION_ID);
+        var savedCategoryRequest = new CategoryRequest(POSITION_ID, secCategoryName);
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -81,11 +85,12 @@ class CategoryControllerTestUseCase extends TestUseCase {
         assertThat(getCategoryResponse.getBody(), is(not(nullValue())));
         assertThat(getCategoryResponse.getBody().categoryName(), equalTo(categoryName));
         assertThat(getCategoryResponse.getBody().positionId(), equalTo(POSITION_ID));
+        assertThat(getCategoryResponse.getBody().categoryId(), equalTo(savedCategory.categoryId()));
 
         //when
         var createCategoryResponse = client.postForEntity(
                 prepareUrl(CATEGORY_RESOURCE),
-                createSecCategoryRequest,
+                savedCategoryRequest,
                 CategoryRequestResponse.class
         );
 
@@ -115,28 +120,29 @@ class CategoryControllerTestUseCase extends TestUseCase {
     void shouldDeleteCategoryById() {
         //given
         var categoryName = "Desserts";
-        var createdCategory = saveCategory(categoryName, POSITION_ID);
+        var savedCategory = saveCategory(categoryName, POSITION_ID);
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         //then
         assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
         assertThat(getCategoryResponse.getBody(), is(notNullValue()));
-        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(createdCategory.categoryName())));
-        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(createdCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(savedCategory.categoryName())));
+        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(savedCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
 
         //when
         client.delete(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -149,19 +155,20 @@ class CategoryControllerTestUseCase extends TestUseCase {
     void shouldNotDeleteCategoryByWrongId() {
         //given
         var categoryName = "Desserts";
-        var createdCategory = saveCategory(categoryName, POSITION_ID);
+        var savedCategory = saveCategory(categoryName, POSITION_ID);
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         //then
         assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
         assertThat(getCategoryResponse.getBody(), is(notNullValue()));
-        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(createdCategory.categoryName())));
-        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(createdCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(savedCategory.categoryName())));
+        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(savedCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
 
         //when
         client.delete(
@@ -170,15 +177,16 @@ class CategoryControllerTestUseCase extends TestUseCase {
         );
 
         getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         //then
         assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
         assertThat(getCategoryResponse.getBody(), is(notNullValue()));
-        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(createdCategory.categoryName())));
-        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(createdCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(savedCategory.categoryName())));
+        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(savedCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
     }
 
     @Test
@@ -188,24 +196,25 @@ class CategoryControllerTestUseCase extends TestUseCase {
         var categoryName = "Drinks";
         var secCategoryName = "Salads";
         var secPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, POSITION_ID);
+        var savedCategory = saveCategory(categoryName, POSITION_ID);
         var updatedCategory = getUpdatedCategoryRequest(secPositionId, secCategoryName);
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         //then
         assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
         assertThat(getCategoryResponse.getBody(), is(notNullValue()));
-        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(createdCategory.categoryName())));
-        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(createdCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(savedCategory.categoryName())));
+        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(savedCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
 
         //when
         var updatedCategoryResponse = client.exchange(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 PUT,
                 createBody(updatedCategory),
                 CategoryResponse.class
@@ -216,10 +225,11 @@ class CategoryControllerTestUseCase extends TestUseCase {
         assertThat(updatedCategoryResponse.getBody(), is(notNullValue()));
         assertThat(updatedCategoryResponse.getBody().categoryName(), is(equalTo(secCategoryName)));
         assertThat(updatedCategoryResponse.getBody().positionId(), is(equalTo(secPositionId)));
+        assertThat(updatedCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
 
         //when
         getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -228,6 +238,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
         assertThat(getCategoryResponse.getBody(), is(notNullValue()));
         assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(secCategoryName)));
         assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(secPositionId)));
+        assertThat(getCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
     }
 
     @Test
@@ -237,20 +248,21 @@ class CategoryControllerTestUseCase extends TestUseCase {
         var categoryName = "Main Courses";
         var secCategoryName = "Entrees";
         var secPositionId = 4L;
-        var createdCategory = saveCategory(categoryName, POSITION_ID);
+        var savedCategory = saveCategory(categoryName, POSITION_ID);
         var updatedCategory = getUpdatedCategoryRequest(secPositionId, secCategoryName);
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(createdCategory.categoryId()),
+                categoryPath(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         //then
         assertThat(getCategoryResponse.getStatusCode(), equalTo(OK));
         assertThat(getCategoryResponse.getBody(), is(notNullValue()));
-        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(createdCategory.categoryName())));
-        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(createdCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryName(), is(equalTo(savedCategory.categoryName())));
+        assertThat(getCategoryResponse.getBody().positionId(), is(equalTo(savedCategory.positionId())));
+        assertThat(getCategoryResponse.getBody().categoryId(), is(equalTo(savedCategory.categoryId())));
 
         //when
         var updatedCategoryResponse = client.exchange(
