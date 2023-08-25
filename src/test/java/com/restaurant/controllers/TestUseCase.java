@@ -6,12 +6,15 @@ import com.restaurant.app.category.controller.dto.CategoryRequestResponse;
 import com.restaurant.app.category.controller.dto.UpdateCategoryRequest;
 import com.restaurant.app.contact.controller.dto.ContactRequest;
 import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
+import com.restaurant.app.food.controller.dto.FoodRequest;
+import com.restaurant.app.food.controller.dto.FoodRequestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -19,6 +22,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class TestUseCase {
 
     @Autowired
@@ -31,12 +35,14 @@ public class TestUseCase {
     protected static final String CONTACT_URL = "/contact";
     protected static final Long POSITION_ID = 1L;
     protected static final String CATEGORY_RESOURCE = "/categories";
-
+    protected static final String FOOD_URL = "/food";
+    protected static final String FOOD_GET_URL = "/food/%d";
     protected static final String CATEGORY_PATH = CATEGORY_RESOURCE + "/%d";
+
     private static final String GET_CONTACT_URL = CONTACT_URL + "/%d";
     private static final String BASE_URL = "http://localhost:%d%s";
 
-    protected CategoryRequestResponse createCategory(String categoryName, Long positionId) {
+    protected CategoryRequestResponse saveCategory(String categoryName, Long positionId) {
         //given
         var createCategoryRequest = new CategoryRequest(positionId, categoryName);
 
@@ -53,12 +59,40 @@ public class TestUseCase {
         return createCategoryResponse.getBody();
     }
 
+    protected FoodRequestResponse saveFood(Long categoryId, String foodName, Integer foodPrice, Long foodPositionId){
+        var foodRequest = createFoodRequest(categoryId, foodPositionId, foodName, foodPrice);
+
+        //when
+        var foodResponse = client.postForEntity(
+                prepareFoodUrlWithoutFoodId(),
+                foodRequest,
+                FoodRequestResponse.class
+        );
+
+        //then
+        assertThat(foodResponse.getStatusCode(), is(equalTo(CREATED)));
+        assertThat(foodResponse.getBody(), is(notNullValue()));
+        return foodResponse.getBody();
+    }
+
     protected UpdateCategoryRequest getUpdatedCategoryRequest(Long positionId, String categoryName) {
         return new UpdateCategoryRequest(positionId, categoryName);
     }
 
     protected String prepareUrl(String resource) {
         return String.format(BASE_URL, port, resource);
+    }
+
+    protected String prepareFoodUrlWithoutFoodId() {
+        return prepareUrl(CATEGORY_RESOURCE + FOOD_URL);
+    }
+
+    protected String prepareFoodUrlWithCategoryId(Long categoryId) {
+        return prepareUrl(String.format(CATEGORY_PATH, categoryId) + FOOD_URL);
+    }
+
+    protected String prepareFoodUrlWithFoodId(Long categoryId, Long foodId){
+        return categoryPath(categoryId) + String.format(FOOD_GET_URL, foodId);
     }
 
     protected String categoryPath(Long categoryId) {
@@ -83,8 +117,19 @@ public class TestUseCase {
     }
 
     protected ContactRequestResponse saveContact() {
-        return client.postForEntity(
-                prepareUrl(CONTACT_URL), createContactRequest(), ContactRequestResponse.class).getBody();
+        //given
+        var contactRequest = createContactRequest();
+
+        //when
+        var contactRequestResponse = client.postForEntity(
+                prepareUrl(CONTACT_URL),
+                createContactRequest(),
+                ContactRequestResponse.class);
+
+        //then
+        assertThat(contactRequestResponse.getStatusCode(), is(equalTo(CREATED)));
+        assertThat(contactRequestResponse.getBody(), is(notNullValue()));
+        return contactRequestResponse.getBody();
     }
 
     protected ContactRequest createUpdateContactRequest() {
@@ -98,6 +143,10 @@ public class TestUseCase {
                 "Golden Street",
                 21
         );
+    }
+
+    protected FoodRequest createFoodRequest(Long categoryId, Long foodPosition, String foodName, Integer foodPrice){
+        return new FoodRequest(categoryId, foodPosition, foodName, foodPrice);
     }
 
     protected <T> HttpEntity<Object> createBody(T body) {

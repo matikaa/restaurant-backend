@@ -44,7 +44,7 @@ public class JpaWrappedCategoryRepository implements CategoryRepository {
 
     @Override
     public List<CategoryModel> findAll() {
-        return categoryRepositoryMapper.categoryEntityToCategoryModel(categoryJpaRepository.findAll());
+        return categoryRepositoryMapper.categoryEntityToCategoryModels(categoryJpaRepository.findAll());
     }
 
     @Override

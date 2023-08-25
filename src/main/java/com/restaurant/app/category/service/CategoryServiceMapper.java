@@ -12,7 +12,7 @@ public interface CategoryServiceMapper {
 
     CategoryServiceMapper INSTANCE = Mappers.getMapper(CategoryServiceMapper.class);
 
-    List<Category> categoryModelsToCategories(List<CategoryModel> categoryEntity);
+    List<Category> categoryModelsToCategories(List<CategoryModel> categoryModels);
 
     Category categoryModelToCategory(CategoryModel categoryModel);
 }

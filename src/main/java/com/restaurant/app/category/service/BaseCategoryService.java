@@ -1,9 +1,9 @@
 package com.restaurant.app.category.service;
 
-import com.restaurant.app.category.service.dto.Category;
 import com.restaurant.app.category.controller.dto.CategoryRequest;
 import com.restaurant.app.category.controller.dto.UpdateCategory;
 import com.restaurant.app.category.repository.CategoryRepository;
+import com.restaurant.app.category.service.dto.Category;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +45,7 @@ public class BaseCategoryService implements CategoryService{
     }
 
     @Override
-    public boolean existsById(Long categoryId) {
+    public boolean existsByCategoryId(Long categoryId) {
         return categoryRepository.exists(categoryId);
     }
 

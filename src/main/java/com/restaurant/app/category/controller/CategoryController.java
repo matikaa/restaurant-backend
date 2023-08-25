@@ -52,7 +52,7 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
-        if(!categoryService.existsById(categoryId)) {
+        if(!categoryService.existsByCategoryId(categoryId)) {
             return ResponseEntity.notFound().build();
         }
 

@@ -10,6 +10,11 @@ import com.restaurant.app.contact.repository.ContactRepository;
 import com.restaurant.app.contact.repository.JpaWrappedContactRepository;
 import com.restaurant.app.contact.service.BaseContactService;
 import com.restaurant.app.contact.service.ContactService;
+import com.restaurant.app.food.repository.FoodJpaRepository;
+import com.restaurant.app.food.repository.FoodRepository;
+import com.restaurant.app.food.repository.JpaWrappedFoodRepository;
+import com.restaurant.app.food.service.BaseFoodService;
+import com.restaurant.app.food.service.FoodService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,5 +37,14 @@ public class AppConfig {
 
     private ContactRepository contactRepositoryInterface(ContactJpaRepository contactJpaRepository) {
         return new JpaWrappedContactRepository(contactJpaRepository);
+    }
+
+    @Bean
+    public FoodService foodServiceInterface(FoodJpaRepository foodJpaRepository) {
+        return new BaseFoodService(foodRepositoryInterface(foodJpaRepository));
+    }
+
+    private FoodRepository foodRepositoryInterface(FoodJpaRepository foodJpaRepository) {
+        return new JpaWrappedFoodRepository(foodJpaRepository);
     }
 }
