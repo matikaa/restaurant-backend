@@ -4,6 +4,8 @@ import com.restaurant.app.App;
 import com.restaurant.app.category.controller.dto.CategoryRequest;
 import com.restaurant.app.category.controller.dto.CategoryRequestResponse;
 import com.restaurant.app.category.controller.dto.UpdateCategoryRequest;
+import com.restaurant.app.contact.controller.dto.ContactRequest;
+import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -15,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 
-@SpringBootTest(classes = App.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class TestUseCase {
 
@@ -25,11 +27,14 @@ public class TestUseCase {
     @LocalServerPort
     protected int port;
 
-    private static final String BASE_URL_FORMAT = "http://localhost:%d%s";
+    protected static final Long WRONG_CATEGORY_ID = -1L;
+    protected static final String CONTACT_URL = "/contact";
+    protected static final Long POSITION_ID = 1L;
     protected static final String CATEGORY_RESOURCE = "/categories";
-    private static final String CATEGORY_PATH = CATEGORY_RESOURCE + "/%d";
-    public static final Long POSITION_ID = 1L;
-    public static final Long WRONG_CATEGORY_ID = -1L;
+
+    protected static final String CATEGORY_PATH = CATEGORY_RESOURCE + "/%d";
+    private static final String GET_CONTACT_URL = CONTACT_URL + "/%d";
+    private static final String BASE_URL = "http://localhost:%d%s";
 
     protected CategoryRequestResponse createCategory(String categoryName, Long positionId) {
         //given
@@ -53,11 +58,46 @@ public class TestUseCase {
     }
 
     protected String prepareUrl(String resource) {
-        return String.format(BASE_URL_FORMAT, port, resource);
+        return String.format(BASE_URL, port, resource);
     }
 
     protected String categoryPath(Long categoryId) {
         return prepareUrl(String.format(CATEGORY_PATH, categoryId));
+    }
+
+    protected String prepareGetContactUrl(Long id) {
+        return prepareUrl(String.format(GET_CONTACT_URL, id));
+    }
+
+    protected ContactRequest createContactRequest() {
+        return new ContactRequest(
+                "company@temp.pl",
+                "509283543",
+                "pon-sb",
+                "9.00",
+                "22.00",
+                "Warszawa",
+                "Zlota",
+                43
+        );
+    }
+
+    protected ContactRequestResponse saveContact() {
+        return client.postForEntity(
+                prepareUrl(CONTACT_URL), createContactRequest(), ContactRequestResponse.class).getBody();
+    }
+
+    protected ContactRequest createUpdateContactRequest() {
+        return new ContactRequest(
+                "restaurant@temp.pl",
+                "521789037",
+                "monday-saturday",
+                "11.00",
+                "24.00",
+                "Poznan",
+                "Golden Street",
+                21
+        );
     }
 
     protected <T> HttpEntity<Object> createBody(T body) {
