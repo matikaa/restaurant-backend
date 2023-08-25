@@ -9,6 +9,7 @@ import com.restaurant.app.contact.repository.ContactJpaRepository;
 import com.restaurant.app.contact.repository.ContactRepository;
 import com.restaurant.app.contact.repository.JpaWrappedContactRepository;
 import com.restaurant.app.contact.service.BaseContactService;
+import com.restaurant.app.contact.service.ContactService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,12 +25,12 @@ public class AppConfig {
         return new JpaWrappedCategoryRepository(categoryJpaRepository);
     }
 
-    public JpaWrappedContactRepository jpaWrappedContactRepository(ContactJpaRepository contactJpaRepository){
-        return new JpaWrappedContactRepository(contactJpaRepository);
+    @Bean
+    public ContactService contactServiceInterface(ContactJpaRepository contactJpaRepository) {
+        return new BaseContactService(contactRepositoryInterface(contactJpaRepository));
     }
 
-    @Bean
-    public BaseContactService baseContactService(ContactRepository contactRepository){
-        return new BaseContactService(contactRepository);
+    private ContactRepository contactRepositoryInterface(ContactJpaRepository contactJpaRepository) {
+        return new JpaWrappedContactRepository(contactJpaRepository);
     }
 }
