@@ -1,6 +1,6 @@
 package com.restaurant.controllers.contact;
 
-import com.restaurant.app.contact.controller.dto.ContactRequest;
+import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
 import com.restaurant.app.contact.controller.dto.ContactResponse;
 import com.restaurant.controllers.TestUseCase;
 import org.junit.jupiter.api.DisplayName;
@@ -23,18 +23,25 @@ class ContactControllerTest extends TestUseCase {
         var contactResponse = client.postForEntity(
                 prepareUrl(CONTACT_URL),
                 contactRequest,
-                ContactRequest.class
+                ContactRequestResponse.class
         );
 
         //then
-        assertThat(contactResponse.getStatusCode(), is(equalTo(OK)));
+        assertThat(contactResponse.getStatusCode(), is(equalTo(CREATED)));
         assertThat(contactResponse.getBody(), is(notNullValue()));
-        assertThat(contactResponse.getBody(), is(equalTo(contactRequest)));
+        assertThat(contactResponse.getBody().contactMail(), is(equalTo(contactRequest.contactMail())));
+        assertThat(contactResponse.getBody().contactPhoneNumber(), is(equalTo(contactRequest.contactPhoneNumber())));
+        assertThat(contactResponse.getBody().openingHoursDays(), is(equalTo(contactRequest.openingHoursDays())));
+        assertThat(contactResponse.getBody().openingHoursOpenTime(), is(equalTo(contactRequest.openingHoursOpenTime())));
+        assertThat(contactResponse.getBody().openingHoursCloseTime(), is(equalTo(contactRequest.openingHoursCloseTime())));
+        assertThat(contactResponse.getBody().addressCity(), is(equalTo(contactRequest.addressCity())));
+        assertThat(contactResponse.getBody().addressStreet(), is(equalTo(contactRequest.addressStreet())));
+        assertThat(contactResponse.getBody().addressNumber(), is(equalTo(contactRequest.addressNumber())));
     }
 
     @Test
     @DisplayName("Should not add contact and return 400 BAD REQUEST")
-    void shouldNotAddContactAndReturnBadRequest(){
+    void shouldNotAddContactAndReturnBadRequest() {
         //given
         var contactRequest = createContactRequest();
 
@@ -42,19 +49,26 @@ class ContactControllerTest extends TestUseCase {
         var contactResponse = client.postForEntity(
                 prepareUrl(CONTACT_URL),
                 contactRequest,
-                ContactRequest.class
+                ContactRequestResponse.class
         );
 
         //then
-        assertThat(contactResponse.getStatusCode(), is(equalTo(OK)));
+        assertThat(contactResponse.getStatusCode(), is(equalTo(CREATED)));
         assertThat(contactResponse.getBody(), is(notNullValue()));
-        assertThat(contactResponse.getBody(), is(equalTo(contactRequest)));
+        assertThat(contactResponse.getBody().contactMail(), is(equalTo(contactRequest.contactMail())));
+        assertThat(contactResponse.getBody().contactPhoneNumber(), is(equalTo(contactRequest.contactPhoneNumber())));
+        assertThat(contactResponse.getBody().openingHoursDays(), is(equalTo(contactRequest.openingHoursDays())));
+        assertThat(contactResponse.getBody().openingHoursOpenTime(), is(equalTo(contactRequest.openingHoursOpenTime())));
+        assertThat(contactResponse.getBody().openingHoursCloseTime(), is(equalTo(contactRequest.openingHoursCloseTime())));
+        assertThat(contactResponse.getBody().addressCity(), is(equalTo(contactRequest.addressCity())));
+        assertThat(contactResponse.getBody().addressStreet(), is(equalTo(contactRequest.addressStreet())));
+        assertThat(contactResponse.getBody().addressNumber(), is(equalTo(contactRequest.addressNumber())));
 
         //when
         contactResponse = client.postForEntity(
                 prepareUrl(CONTACT_URL),
                 contactRequest,
-                ContactRequest.class
+                ContactRequestResponse.class
         );
 
         //then
@@ -109,7 +123,7 @@ class ContactControllerTest extends TestUseCase {
         var savedContact = saveContact();
 
         //when
-        var contactResponse= client.getForEntity(
+        var contactResponse = client.getForEntity(
                 prepareGetContactUrl(savedContact.contactId()),
                 ContactResponse.class
         );
@@ -146,7 +160,7 @@ class ContactControllerTest extends TestUseCase {
         Long notExistingContactId = -1L;
 
         //when
-        var contactResponse= client.getForEntity(
+        var contactResponse = client.getForEntity(
                 prepareGetContactUrl(savedContact.contactId()),
                 ContactResponse.class
         );
@@ -186,7 +200,7 @@ class ContactControllerTest extends TestUseCase {
 
     @Test
     @DisplayName("Should update contact and return 200 OK")
-    void shouldUpdateContactAndReturnOK(){
+    void shouldUpdateContactAndReturnOK() {
         //given
         var savedContact = saveContact();
         var contactRequest = createUpdateContactRequest();
@@ -214,7 +228,7 @@ class ContactControllerTest extends TestUseCase {
 
     @Test
     @DisplayName("Should update contact and return 200 NOT FOUND")
-    void shouldNotUpdateContactAndReturnNotFound(){
+    void shouldNotUpdateContactAndReturnNotFound() {
         //given
         var savedContact = saveContact();
         var contactRequest = createUpdateContactRequest();
