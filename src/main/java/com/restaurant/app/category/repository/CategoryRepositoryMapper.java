@@ -16,5 +16,5 @@ public interface CategoryRepositoryMapper {
 
     CategoryModel categoryEntityToCategoryModel(CategoryEntity categoryEntity);
 
-    List<CategoryModel> categoryEntityToCategoryModel(List<CategoryEntity> categoryEntity);
+    List<CategoryModel> categoryEntityToCategoryModels(List<CategoryEntity> categoryEntities);
 }

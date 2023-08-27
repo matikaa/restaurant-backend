@@ -19,7 +19,7 @@ public interface CategoryService {
 
     Optional<Category> update(UpdateCategory updateCategory);
 
-    boolean existsById(Long categoryId);
+    boolean existsByCategoryId(Long categoryId);
 
     boolean existsByPositionId(Long positionId);
 }
