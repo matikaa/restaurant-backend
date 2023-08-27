@@ -7,6 +7,8 @@ import com.restaurant.app.contact.service.ContactService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.HttpStatus.CREATED;
+
 @RestController
 @RequestMapping("/contact")
 public class ContactController {
@@ -31,7 +33,7 @@ public class ContactController {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok().body(
+        return ResponseEntity.status(CREATED).body(
                 contactControllerMapper.contactToContactRequestResponse(
                         contactService.addContact(contactControllerMapper.contactRequestToContact(contactRequest))));
     }
