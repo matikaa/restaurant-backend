@@ -12,6 +12,7 @@ import java.util.List;
 
 @Mapper
 public interface CategoryControllerMapper {
+
     CategoryControllerMapper INSTANCE = Mappers.getMapper(CategoryControllerMapper.class);
 
     CategoryResponse categoryToCategoryResponse(Category category);

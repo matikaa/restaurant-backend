@@ -45,7 +45,7 @@ public class JpaWrappedFoodRepository implements FoodRepository {
     }
 
     @Override
-    public Optional<FoodModel> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId){
+    public Optional<FoodModel> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId) {
         return foodJpaRepository.getFoodByCategoryIdAndFoodId(categoryId, foodId)
                 .map(foodRepositoryMapper::foodEntityToFoodModel);
     }

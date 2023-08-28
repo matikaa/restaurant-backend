@@ -1,24 +1,27 @@
 package com.restaurant.app.category.controller;
 
 import com.restaurant.app.category.controller.dto.*;
+import com.restaurant.app.category.controller.validator.CategoryValidator;
 import com.restaurant.app.category.service.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
 
+    private final CategoryValidator categoryValidator;
+
     private final CategoryService categoryService;
 
     private static final CategoryControllerMapper categoryControllerMapper = CategoryControllerMapper.INSTANCE;
 
     public CategoryController(CategoryService categoryService) {
+        this.categoryValidator = new CategoryValidator();
         this.categoryService = categoryService;
     }
 
@@ -39,8 +42,9 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<CategoryRequestResponse> addCategory(@RequestBody CategoryRequest categoryRequest) {
-        if(categoryService.existsByPositionId(categoryRequest.positionId())) {
-            return ResponseEntity.status(BAD_REQUEST).build();
+        if (categoryValidator.isCategoryRequestNotValid(categoryRequest) ||
+                categoryService.existsByPositionId(categoryRequest.positionId())) {
+            return ResponseEntity.badRequest().build();
         }
 
         return Optional.ofNullable(categoryRequest)
@@ -52,7 +56,7 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
-        if(!categoryService.existsByCategoryId(categoryId)) {
+        if (!categoryService.existsByCategoryId(categoryId)) {
             return ResponseEntity.notFound().build();
         }
 
@@ -64,8 +68,12 @@ public class CategoryController {
     @PutMapping("/{categoryId}")
     public ResponseEntity<CategoryResponse> update(@PathVariable Long categoryId,
                                                    @RequestBody UpdateCategoryRequest updateCategoryRequest) {
+        if (categoryValidator.isUpdateCategoryRequestNotValid(updateCategoryRequest)) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return categoryService.update(categoryControllerMapper.
-                updateCategoryRequestToUpdateCategory(updateCategoryRequest, categoryId))
+                        updateCategoryRequestToUpdateCategory(updateCategoryRequest, categoryId))
                 .map(updatedCategory -> ResponseEntity.ok().body(
                         categoryControllerMapper.categoryToCategoryResponse(updatedCategory)))
                 .orElseGet(() -> ResponseEntity.notFound().build());

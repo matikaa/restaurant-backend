@@ -65,7 +65,7 @@ public class TestUseCase {
         return new FoodRequestUpdate(categoryId, positionId, foodName, foodPrice);
     }
 
-    protected FoodRequestResponse saveFood(Long categoryId, String foodName, Integer foodPrice, Long foodPositionId){
+    protected FoodRequestResponse saveFood(Long categoryId, String foodName, Integer foodPrice, Long foodPositionId) {
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
@@ -97,7 +97,7 @@ public class TestUseCase {
         return prepareUrl(String.format(CATEGORY_PATH, categoryId) + FOOD_URL);
     }
 
-    protected String prepareFoodUrlWithFoodId(Long categoryId, Long foodId){
+    protected String prepareFoodUrlWithFoodId(Long categoryId, Long foodId) {
         return categoryPath(categoryId) + String.format(FOOD_GET_URL, foodId);
     }
 
@@ -151,7 +151,7 @@ public class TestUseCase {
         );
     }
 
-    protected FoodRequest createFoodRequest(Long foodPosition, String foodName, Integer foodPrice){
+    protected FoodRequest createFoodRequest(Long foodPosition, String foodName, Integer foodPrice) {
         return new FoodRequest(foodPosition, foodName, foodPrice);
     }
 
