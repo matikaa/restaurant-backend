@@ -15,6 +15,7 @@ import com.restaurant.app.food.repository.FoodRepository;
 import com.restaurant.app.food.repository.JpaWrappedFoodRepository;
 import com.restaurant.app.food.service.BaseFoodService;
 import com.restaurant.app.food.service.FoodService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

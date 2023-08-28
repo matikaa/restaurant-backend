@@ -16,7 +16,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    private final static CategoryControllerMapper categoryControllerMapper = CategoryControllerMapper.INSTANCE;
+    private static final CategoryControllerMapper categoryControllerMapper = CategoryControllerMapper.INSTANCE;
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;

@@ -8,6 +8,8 @@ import com.restaurant.app.contact.controller.dto.ContactRequest;
 import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
 import com.restaurant.app.food.controller.dto.FoodRequest;
 import com.restaurant.app.food.controller.dto.FoodRequestResponse;
+
+import com.restaurant.app.food.controller.dto.FoodRequestUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -59,12 +61,16 @@ public class TestUseCase {
         return createCategoryResponse.getBody();
     }
 
+    protected FoodRequestUpdate createFoodRequestUpdate(Long categoryId, long positionId, String foodName, int foodPrice) {
+        return new FoodRequestUpdate(categoryId, positionId, foodName, foodPrice);
+    }
+
     protected FoodRequestResponse saveFood(Long categoryId, String foodName, Integer foodPrice, Long foodPositionId){
-        var foodRequest = createFoodRequest(categoryId, foodPositionId, foodName, foodPrice);
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithoutFoodId(),
+                prepareFoodUrlWithCategoryId(categoryId),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -145,8 +151,8 @@ public class TestUseCase {
         );
     }
 
-    protected FoodRequest createFoodRequest(Long categoryId, Long foodPosition, String foodName, Integer foodPrice){
-        return new FoodRequest(categoryId, foodPosition, foodName, foodPrice);
+    protected FoodRequest createFoodRequest(Long foodPosition, String foodName, Integer foodPrice){
+        return new FoodRequest(foodPosition, foodName, foodPrice);
     }
 
     protected <T> HttpEntity<Object> createBody(T body) {

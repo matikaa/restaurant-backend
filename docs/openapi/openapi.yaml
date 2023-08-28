@@ -1,0 +1,791 @@
+openapi: 3.0.3
+info:
+  title: Restaurant server
+  description: ""
+  version: 1.0.0
+tags:
+  - name: categories
+    description: All available requests related to categories
+  - name: users
+    description: All available requests related to users
+paths:
+  /categories:
+    get:
+      tags:
+        - categories
+      summary: Get all categories
+      description: |
+        Get all available categories
+
+      operationId: getCategories
+      responses:
+        '200':
+          description: Categories were fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  CategoryListResponse:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CategoryResponse'
+
+    post:
+      tags:
+        - categories
+      summary: Add a new category
+      description: |
+        Add a new category
+        
+        Allowed roles: ```ADMIN```
+      operationId: addCategory
+      requestBody:
+        description: Create a new category
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequest'
+        required: true
+      responses:
+        '201':
+          description: Category was saved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryRequestResponse'
+        '400':
+          description: Category with given position already exists
+        '404':
+          description: Category could not be saved
+
+  /categories/{categoryId}:
+    get:
+      tags:
+        - categories
+      summary: Get single category
+      description: Get a single category by categoryId
+      operationId: getCategory
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: ID of the category
+      responses:
+        '200':
+          description: Category was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '404':
+          description: Category was not found
+    delete:
+      tags:
+        - categories
+      summary: Delete a category
+      description: |
+        Delete a category
+        
+        Allowed roles: ```ADMIN```
+      operationId: deleteCategory
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: ID of the category
+      responses:
+        '200':
+          description: Category was deleted successfully
+        '404':
+          description: Category was not found
+    put:
+      tags:
+        - categories
+      summary: Update a category
+      description: |
+        Update a category
+        
+        Allowed roles: ```ADMIN```
+      operationId: updateCategory
+      requestBody:
+        description: Update a category
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCategoryRequest'
+        required: true
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+      responses:
+        '200':
+          description: Category was updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryResponse'
+        '404':
+          description: Category was not found
+
+  /categories/{categoryId}/food:
+    get:
+      tags:
+        - food
+      summary: Get food related to category
+      description: |
+        Get food by categoryId
+
+      operationId: getFood
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+      responses:
+        '200':
+          description: Food was fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  food:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FoodResponse'
+        '404':
+          description: Food was not found
+    post:
+      tags:
+        - food
+      summary: Post a new food related to category
+      description: |
+
+        Allowed roles: ```ADMIN```
+      operationId: postFood
+      requestBody:
+        description: Create a new dish with existing category
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodRequest'
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+      responses:
+        '201':
+          description: Food was added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodRequestResponse'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: "application/json"
+              description: One of multiple possible Content-Type headers
+        '400':
+          description: Food is invalid
+        '404':
+          description: Category or food was not found
+
+  /categories/{categoryId}/food/{foodId}:
+    get:
+      tags:
+        - food
+      summary: Get a single food related to category
+      description: |
+        Get a single food by foodId and categoryId
+
+      operationId: getFoodByFoodId
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+        - in: path
+          name: foodId
+          schema:
+            type: integer
+          required: true
+          description: ID of food
+      responses:
+        '200':
+          description: Food was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodResponse'
+        '404':
+          description: Food was not found
+    put:
+      tags:
+        - food
+      summary: Update a single food related to category
+      description: |
+
+        Allowed roles: ```ADMIN```
+      operationId: updateFood
+      requestBody:
+        description: Update food
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodRequestUpdate'
+        required: true
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+        - in: path
+          name: foodId
+          schema:
+            type: integer
+          required: true
+          description: ID of food
+      responses:
+        '200':
+          description: Food was updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodResponse'
+        '400':
+          description: Food is invalid
+        '404':
+          description: Food was not found
+    delete:
+      tags:
+        - food
+      summary: Delete a single food related to category
+      description: |
+
+        Allowed roles: ```ADMIN```
+      operationId: deleteFood
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+        - in: path
+          name: foodId
+          schema:
+            type: integer
+          required: true
+          description: ID of food
+      responses:
+        '200':
+          description: Food was deleted successfully
+        '404':
+          description: Food was not found
+
+  /users:
+    get:
+      tags:
+        - users
+      summary: Get all users
+      description: |
+        **Get all users that are verified, unverified or all available users.**
+        
+        Allowed roles: ```ADMIN```
+      operationId: getUsers
+      parameters:
+        - in: query
+          name: verified
+          schema:
+            type: boolean
+            example: true
+          required: false
+          description: Boolean that allows to specify what kind of users should be fetched
+      responses:
+        '200':
+          description: Users were fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserGetResponse'
+        '401':
+          description: User couldn't be authenticated
+        '403':
+          description: User has not been authorized to access that resource
+    post:
+      tags:
+        - users
+      summary: Register a new user
+      description: |
+        **Register a new user**
+        
+        Allowed roles: ```ADMIN```
+      operationId: postUser
+      requestBody:
+        description: Enter user details in order to register a new user. Mail is validated to be from configured domain.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPost'
+        required: true
+      responses:
+        '201':
+          description: User was created successfully
+        '409':
+          description: User already exists
+        '400':
+          description: Bad request
+
+  /contact:
+    post:
+      tags:
+        - contact
+      summary: Request for adding contact
+      description: |
+        Add contact of company
+
+      operationId: addContact
+      requestBody:
+        description: add contact of company
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequestBody'
+      responses:
+        '201':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contact:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContactResponse'
+        '400':
+          description: Contact already exists
+
+  /contact/{contactId}:
+    get:
+      tags:
+        - contact
+      summary: Get contact
+      description: |
+        **Get contact of company**
+
+      operationId: getContact
+      parameters:
+        - in: path
+          name: contactId
+          schema:
+            type: integer
+          required: true
+          description: ID of the contact
+      responses:
+        '200':
+          description: Contact was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '404':
+          description: Contact was not found
+
+    delete:
+      tags:
+        - contact
+      summary: Delete contact
+      description: Delete contact
+      operationId: deleteContact
+      parameters:
+        - in: path
+          name: contactId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: ID of the contact
+      responses:
+        '200':
+          description: Contact was deleted successfully
+        '404':
+          description: Contact was not found
+    put:
+      tags:
+        - contact
+      summary: Update contact
+      description: Update contact
+      operationId: updateContact
+      requestBody:
+        description: Update contact
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequestBody'
+        required: true
+      parameters:
+        - in: path
+          name: contactId
+          schema:
+            type: integer
+          required: true
+          description: ID of the contact
+      responses:
+        '200':
+          description: Contact was updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '404':
+          description: Contact was not found
+
+components:
+  schemas:
+    Category:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 3
+        posiionId:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: 'Main dishes'
+
+    CategoryRequest:
+      type: object
+      properties:
+        positionId:
+          type: integer
+          format: int64
+          example: 5
+        categoryName:
+          type: string
+          example: 'Main dishes'
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        positionId:
+          type: integer
+          format: int64
+          example: 5
+        categoryName:
+          type: string
+          example: 'Main dishes'
+
+    CategoryResponse:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+          example: 5
+        positionId:
+          type: integer
+          format: int64
+          example: 5
+        categoryName:
+          type: string
+          example: "Main dishes"
+
+    CategoryRequestResponse:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+          example: 1
+        positionId:
+          type: integer
+          format: int64
+          example: 5
+        categoryName:
+          type: string
+          example: "Main dishes"
+
+
+    ContactResponse:
+      type: object
+      properties:
+        contactMail:
+          type: string
+          example: 'company@temp.pl'
+        contactPhoneNumber:
+          type: string
+          example: '509283543'
+        openingHoursDays:
+          type: string
+          example: 'pon-sb'
+        openingHoursOpenTime:
+          type: string
+          format: time
+          example: '9.00'
+        openingHoursCloseTime:
+          type: string
+          format: time
+          example: '22.00'
+        addressCity:
+          type: string
+          example: "Warszawa"
+        addressStreet:
+          type: string
+          example: "Zlota"
+        addressNumber:
+          type: number
+          example: 43
+
+    UserGetResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        login:
+          type: string
+          example: 'mariopuzo'
+        password:
+          type: string
+          example: 'mero314$'
+        email:
+          type: string
+          example: 'acso@temp.pl'
+        name:
+          type: string
+          example: 'Krystian'
+        surname:
+          type: string
+          example: 'Pieczarka'
+        phoneNumber:
+          type: string
+          example: '520449029'
+        createdAt:
+          type: string
+          format: data-time
+          example: '2023-05-26T10:20:30'
+        role:
+          type: string
+          example: 'User'
+        address:
+          type: object
+          properties:
+            city:
+              type: string
+              example: "Warszawa"
+            street:
+              type: string
+              example: "Zlota"
+            number:
+              type: number
+              example: 43
+
+    UserPost:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        login:
+          type: string
+          example: 'mariopuzo'
+        password:
+          type: string
+          example: 'mero314$'
+        email:
+          type: string
+          example: 'acso@temp.pl'
+        name:
+          type: string
+          example: 'Krystian'
+        surname:
+          type: string
+          example: 'Pieczarka'
+        phoneNumber:
+          type: string
+          example: '520449029'
+        createdAt:
+          type: string
+          format: data-time
+          example: '2023-05-26T10:20:30'
+        role:
+          type: string
+          example: 'User'
+        address:
+          type: object
+          properties:
+            city:
+              type: string
+              example: "Warszawa"
+            street:
+              type: string
+              example: "Zlota"
+            number:
+              type: number
+              example: 43
+
+    FoodListResponse:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+          example: 3
+        positionId:
+          type: integer
+          format: int64
+          example: 4
+        foodName:
+          type: string
+          example: 'French fries'
+        foodPrice:
+          type: integer
+          example: 12
+
+    FoodResponse:
+      type: object
+      properties:
+        foodId:
+          type: integer
+          format: int64
+          example: 3
+        categoryId:
+          type: integer
+          format: int64
+          example: 3
+        positionId:
+          type: integer
+          format: int64
+          example: 4
+        foodName:
+          type: string
+          example: 'French fries'
+        foodPrice:
+          type: integer
+          example: 12
+
+    FoodRequest:
+      type: object
+      properties:
+        positionId:
+          type: integer
+          format: int64
+          example: 3
+        foodName:
+          type: string
+          example: 'French fries'
+        foodPrice:
+          type: integer
+          example: 12
+
+    FoodRequestUpdate:
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+          example: 3
+        positionId:
+          type: integer
+          format: int64
+          example: 3
+        foodName:
+          type: string
+          example: 'French fries'
+        foodPrice:
+          type: integer
+          example: 12
+
+    FoodRequestResponse:
+      type: object
+      properties:
+        foodId:
+          type: integer
+          format: int64
+          example: 2
+        categoryId:
+          type: integer
+          format: int64
+          example: 3
+        positionId:
+          type: integer
+          format: int64
+          example: 3
+        foodName:
+          type: string
+          example: 'French fries'
+        foodPrice:
+          type: integer
+          example: 12
+
+    ContactRequestBody:
+      type: object
+      properties:
+        contactMail:
+          type: string
+          example: 'company@temp.pl'
+        contactPhoneNumber:
+          type: string
+          example: '509283543'
+        openingHoursDays:
+          type: string
+          example: 'pon-sb'
+        openingHoursOpenTime:
+          type: string
+          format: time
+          example: '9.00'
+        openingHoursCloseTime:
+          type: string
+          format: time
+          example: '22.00'
+        addressCity:
+          type: string
+          example: "Warszawa"
+        addressStreet:
+          type: string
+          example: "Zlota"
+        addressNumber:
+          type: number
+          example: 43
+
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/MARCINFREJNAGEL11/restaurant/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/240699/restaurant/1.0.0
