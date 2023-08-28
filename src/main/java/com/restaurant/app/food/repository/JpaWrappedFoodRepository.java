@@ -23,18 +23,12 @@ public class JpaWrappedFoodRepository implements FoodRepository {
     }
 
     @Override
-    public List<FoodModel> findAll() {
-        return foodRepositoryMapper.foodEntityToFoodModels(foodJpaRepository.findAll());
-    }
-
-    @Override
     public List<FoodModel> getFoodByCategoryId(Long categoryId) {
         return foodRepositoryMapper.foodEntityToFoodModels(foodJpaRepository.getFoodByCategoryId(categoryId));
     }
 
-    @Override
-    public boolean existsByFoodId(Long foodId) {
-        return foodJpaRepository.existsById(foodId);
+    public boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId) {
+        return foodJpaRepository.existsByCategoryIdAndFoodId(categoryId, foodId);
     }
 
     @Override

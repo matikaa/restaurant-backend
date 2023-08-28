@@ -8,19 +8,17 @@ import java.util.Optional;
 
 public interface FoodService {
 
-    List<Food> getAll();
-
     Food insert(FoodRequest foodRequest, Long categoryId);
 
     boolean existsByPositionId(Long categoryId, Long positionId);
 
     List<Food> getFoodByCategoryId(Long categoryId);
 
-    boolean existsByFoodId(Long foodId);
-
     void deleteById(Long foodId);
 
     Optional<Food> update(Food food);
 
     Optional<Food> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId);
+
+    boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId);
 }

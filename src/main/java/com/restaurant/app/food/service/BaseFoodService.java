@@ -28,18 +28,13 @@ public class BaseFoodService implements FoodService {
     }
 
     @Override
-    public List<Food> getAll() {
-        return foodServiceMapper.foodModelsToFoods(foodRepository.findAll());
-    }
-
-    @Override
     public List<Food> getFoodByCategoryId(Long categoryId) {
         return foodServiceMapper.foodModelsToFoods(foodRepository.getFoodByCategoryId(categoryId));
     }
 
     @Override
-    public boolean existsByFoodId(Long foodId) {
-        return foodRepository.existsByFoodId(foodId);
+    public boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId) {
+        return foodRepository.existsByCategoryIdAndFoodId(categoryId, foodId);
     }
 
     @Override

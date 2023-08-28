@@ -10,15 +10,13 @@ public interface FoodRepository {
 
     FoodModel save(FoodRequest foodRequest, Long categoryId);
 
-    List<FoodModel> findAll();
-
     List<FoodModel> getFoodByCategoryId(Long categoryId);
-
-    boolean existsByFoodId(Long foodId);
 
     void deleteById(Long foodId);
 
     Optional<FoodModel> update(FoodModel foodModel);
 
     Optional<FoodModel> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId);
+
+    boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId);
 }

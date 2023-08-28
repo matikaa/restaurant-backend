@@ -342,8 +342,34 @@ class FoodControllerTest extends TestUseCase {
     }
 
     @Test
-    @DisplayName("Should not delete food and get 200 OK")
-    void shouldNotDeleteFoodAndReturnOK() {
+    @DisplayName("Should not delete food by wrong categoryId and get 200 OK")
+    void shouldNotDeleteFoodByWrongCategoryIdAndReturnOK() {
+        //given
+        var categoryName = "Soups";
+        var categoryPositionId = 3L;
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
+
+        var foodName = "Tomato soup";
+        var foodPositionId = 2L;
+        var foodPrice = 24;
+        var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
+
+        //when
+        client.delete(prepareFoodUrlWithFoodId(WRONG_CATEGORY_ID, savedFood.foodId()));
+
+        var contactDeleted = client.getForEntity(
+                prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()),
+                FoodRequestResponse.class
+        );
+
+        //then
+        assertThat(contactDeleted.getStatusCode(), is(equalTo(OK)));
+        assertThat(contactDeleted.getBody(), is(notNullValue()));
+    }
+
+    @Test
+    @DisplayName("Should not delete food by wrong foodId and get 200 OK")
+    void shouldNotDeleteFoodByWrongFoodIdAndReturnOK() {
         //given
         var categoryName = "Soups";
         var categoryPositionId = 3L;
@@ -460,6 +486,47 @@ class FoodControllerTest extends TestUseCase {
         //when
         var updatedFoodResponse = client.exchange(
                 prepareFoodUrlWithFoodId(WRONG_CATEGORY_ID, foodResponse.getBody().foodId()),
+                PUT,
+                createBody(updateFoodRequest),
+                FoodResponse.class
+        );
+
+        //then
+        assertThat(updatedFoodResponse.getStatusCode(), is(equalTo(NOT_FOUND)));
+    }
+
+    @Test
+    @DisplayName("Should not update food by wrong foodId return 404 NOT FOUND")
+    void shouldNotUpdateFoodByWrongFoodIdAndReturnNotFound() {
+        //given
+        var wrongFoodId = -1L;
+        var categoryName = "Coffees";
+        var categoryPositionId = 2L;
+        var savedCategory = saveCategory(categoryName, categoryPositionId);
+
+        var foodName = "Cappuccino";
+        var foodPositionId = 5L;
+        var foodPrice = 6;
+        var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
+
+        var secPositionId = 2L;
+        var secFoodPrice = 15;
+        var updateFoodRequest = createFoodRequestUpdate(savedCategory.categoryId(), secPositionId, foodName, secFoodPrice);
+
+        //when
+        var foodResponse = client.postForEntity(
+                prepareFoodUrlWithCategoryId(savedCategory.categoryId()),
+                foodRequest,
+                FoodRequestResponse.class
+        );
+
+        //then
+        assertThat(foodResponse.getStatusCode(), is(equalTo(CREATED)));
+        assertThat(foodResponse.getBody(), is(notNullValue()));
+
+        //when
+        var updatedFoodResponse = client.exchange(
+                prepareFoodUrlWithFoodId(savedCategory.categoryId(), wrongFoodId),
                 PUT,
                 createBody(updateFoodRequest),
                 FoodResponse.class
