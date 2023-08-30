@@ -5,9 +5,6 @@ import com.restaurant.app.food.controller.dto.FoodRequestUpdate;
 
 public class FoodValidator {
 
-    public FoodValidator() {
-    }
-
     public boolean isFoodRequestNotValid(FoodRequest foodRequest) {
         return !(foodRequest instanceof FoodRequest) || foodRequest.positionId() == null ||
                 foodRequest.positionId() <= 0 || foodRequest.foodName() == null ||

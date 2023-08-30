@@ -21,7 +21,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var contactResponse = client.postForEntity(
-                prepareUrl(CONTACT_URL),
+                prepareUrl(CONTACT_RESOURCE),
                 contactRequest,
                 ContactRequestResponse.class
         );
@@ -47,7 +47,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var contactResponse = client.postForEntity(
-                prepareUrl(CONTACT_URL),
+                prepareUrl(CONTACT_RESOURCE),
                 contactRequest,
                 ContactRequestResponse.class
         );
@@ -66,7 +66,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         contactResponse = client.postForEntity(
-                prepareUrl(CONTACT_URL),
+                prepareUrl(CONTACT_RESOURCE),
                 contactRequest,
                 ContactRequestResponse.class
         );
@@ -83,7 +83,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var contactResponse = client.getForEntity(
-                prepareGetContactUrl(savedContact.contactId()),
+                prepareContactUrlWithContactId(savedContact.contactId()),
                 ContactResponse.class
         );
 
@@ -108,7 +108,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var contactResponse = client.getForEntity(
-                prepareGetContactUrl(notExistingContactId),
+                prepareContactUrlWithContactId(notExistingContactId),
                 ContactResponse.class
         );
 
@@ -124,7 +124,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var contactResponse = client.getForEntity(
-                prepareGetContactUrl(savedContact.contactId()),
+                prepareContactUrlWithContactId(savedContact.contactId()),
                 ContactResponse.class
         );
 
@@ -141,10 +141,10 @@ class ContactControllerTest extends TestUseCase {
         assertThat(contactResponse.getBody().addressNumber(), is(equalTo(savedContact.addressNumber())));
 
         //when
-        client.delete(prepareGetContactUrl(savedContact.contactId()));
+        client.delete(prepareContactUrlWithContactId(savedContact.contactId()));
 
         var contactDeleted = client.getForEntity(
-                prepareGetContactUrl(savedContact.contactId()),
+                prepareContactUrlWithContactId(savedContact.contactId()),
                 ContactResponse.class
         );
 
@@ -161,7 +161,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var contactResponse = client.getForEntity(
-                prepareGetContactUrl(savedContact.contactId()),
+                prepareContactUrlWithContactId(savedContact.contactId()),
                 ContactResponse.class
         );
 
@@ -178,10 +178,10 @@ class ContactControllerTest extends TestUseCase {
         assertThat(contactResponse.getBody().addressNumber(), is(equalTo(savedContact.addressNumber())));
 
         //when
-        client.delete(prepareGetContactUrl(notExistingContactId));
+        client.delete(prepareContactUrlWithContactId(notExistingContactId));
 
         var contactNotDeleted = client.getForEntity(
-                prepareGetContactUrl(savedContact.contactId()),
+                prepareContactUrlWithContactId(savedContact.contactId()),
                 ContactResponse.class
         );
 
@@ -207,7 +207,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var updateResponse = client.exchange(
-                prepareGetContactUrl(savedContact.contactId()),
+                prepareContactUrlWithContactId(savedContact.contactId()),
                 PUT,
                 createBody(contactRequest),
                 ContactResponse.class
@@ -227,7 +227,7 @@ class ContactControllerTest extends TestUseCase {
     }
 
     @Test
-    @DisplayName("Should update contact and return 200 NOT FOUND")
+    @DisplayName("Should update contact and return 404 NOT FOUND")
     void shouldNotUpdateContactAndReturnNotFound() {
         //given
         var savedContact = saveContact();
@@ -236,7 +236,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var updateResponse = client.exchange(
-                prepareGetContactUrl(notExistingContactId),
+                prepareContactUrlWithContactId(notExistingContactId),
                 PUT,
                 createBody(contactRequest),
                 ContactResponse.class
@@ -247,7 +247,7 @@ class ContactControllerTest extends TestUseCase {
 
         //when
         var contactNotDeleted = client.getForEntity(
-                prepareGetContactUrl(savedContact.contactId()),
+                prepareContactUrlWithContactId(savedContact.contactId()),
                 ContactResponse.class
         );
 

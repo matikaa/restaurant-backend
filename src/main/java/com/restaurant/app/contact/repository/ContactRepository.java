@@ -14,7 +14,7 @@ public interface ContactRepository{
 
     void delete(Long contactId);
 
-    Boolean existsById(Long contactId);
+    boolean existsById(Long contactId);
 
-    Boolean existsAny();
+    boolean existsAny();
 }

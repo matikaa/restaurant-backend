@@ -15,9 +15,21 @@ import com.restaurant.app.food.repository.FoodRepository;
 import com.restaurant.app.food.repository.JpaWrappedFoodRepository;
 import com.restaurant.app.food.service.BaseFoodService;
 import com.restaurant.app.food.service.FoodService;
-
+import com.restaurant.app.jwt.repository.JpaWrappedJwtRepository;
+import com.restaurant.app.jwt.repository.JwtJpaRepository;
+import com.restaurant.app.jwt.repository.JwtRepository;
+import com.restaurant.app.jwt.service.BaseJwtService;
+import com.restaurant.app.jwt.service.JwtService;
+import com.restaurant.app.user.repository.JpaWrappedUserRepository;
+import com.restaurant.app.user.repository.UserJpaRepository;
+import com.restaurant.app.user.repository.UserRepository;
+import com.restaurant.app.user.service.BaseUserService;
+import com.restaurant.app.user.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AppConfig {
@@ -47,5 +59,28 @@ public class AppConfig {
 
     private FoodRepository foodRepositoryInterface(FoodJpaRepository foodJpaRepository) {
         return new JpaWrappedFoodRepository(foodJpaRepository);
+    }
+
+    @Bean
+    public UserService userServiceInterface(UserJpaRepository userJpaRepository,
+                                            JwtService jwtService,
+                                            PasswordEncoder passwordEncoder,
+                                            AuthenticationManager authenticationManager) {
+        return new BaseUserService(userRepositoryInterface(userJpaRepository),
+                jwtService, passwordEncoder, authenticationManager);
+    }
+
+    private UserRepository userRepositoryInterface(UserJpaRepository userJpaRepository) {
+        return new JpaWrappedUserRepository(userJpaRepository);
+    }
+
+    @Bean
+    public BaseJwtService jwtService(JwtRepository jwtRepository, @Value("${authentication.secret}") String jwtSecret) {
+        return new BaseJwtService(jwtRepository, jwtSecret);
+    }
+
+    @Bean
+    public JwtRepository jwtRepository(JwtJpaRepository jwtJpaRepository) {
+        return new JpaWrappedJwtRepository(jwtJpaRepository);
     }
 }

@@ -310,18 +310,10 @@ paths:
         - users
       summary: Get all users
       description: |
-        **Get all users that are verified, unverified or all available users.**
+        **Get all users**
         
         Allowed roles: ```ADMIN```
       operationId: getUsers
-      parameters:
-        - in: query
-          name: verified
-          schema:
-            type: boolean
-            example: true
-          required: false
-          description: Boolean that allows to specify what kind of users should be fetched
       responses:
         '200':
           description: Users were fetched successfully
@@ -333,34 +325,135 @@ paths:
                   users:
                     type: array
                     items:
-                      $ref: '#/components/schemas/UserGetResponse'
-        '401':
-          description: User couldn't be authenticated
+                      $ref: '#/components/schemas/UserListResponse'
         '403':
-          description: User has not been authorized to access that resource
+          description: User has no permission to access that resource
     post:
       tags:
         - users
       summary: Register a new user
       description: |
-        **Register a new user**
-        
-        Allowed roles: ```ADMIN```
-      operationId: postUser
+        **Add a new user**
+
+      operationId: addUser
       requestBody:
-        description: Enter user details in order to register a new user. Mail is validated to be from configured domain.
+        description: Enter user details in order to add a new user.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPost'
+              $ref: '#/components/schemas/UserRequest'
         required: true
       responses:
         '201':
           description: User was created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRequestResponse'
+        '403':
+          description: Wrong email
         '409':
           description: User already exists
-        '400':
-          description: Bad request
+
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: Get single user
+      description: |
+        **Get single user**
+        
+        Allowed roles: ```ADMIN```
+      operationId: getUser
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: User was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '403':
+          description: User has no permission to access that resource
+        '404':
+          description: User not exists
+
+  /users/login:
+    post:
+      tags:
+        - users
+      summary: Login user
+      description: |
+        **Logging of user**
+
+      operationId: login
+      requestBody:
+        description: Enter user details in order to add a new user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: User was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginRequestResponse'
+        '404':
+          description: Wrong email or password
+
+  /users/logout:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Logout user
+      description: |
+        **Logging out of user**
+
+        Allowed roles: ```ADMIN```, ```USER```
+      operationId: logout
+      responses:
+        '200':
+          description: User was fetched successfully
+        '403':
+          description: User has no permission to access that resource
+
+  /users/password:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Change password
+      description: |
+        **Change password by user**
+
+        Allowed roles: ```ADMIN```, ```USER```
+      operationId: changePassword
+      requestBody:
+        description: Enter current and new password by user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: Password changed
+        '403':
+          description: User has no permission to access that resource
+        '409':
+          description: Wrong password or new is the same as old
 
   /contact:
     post:
@@ -469,6 +562,11 @@ paths:
           description: Contact was not found
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Category:
       required:
@@ -479,7 +577,7 @@ components:
           type: integer
           format: int64
           example: 3
-        posiionId:
+        positionId:
           type: integer
           format: int64
           example: 1
@@ -570,31 +668,19 @@ components:
           type: number
           example: 43
 
-    UserGetResponse:
+    UserListResponse:
       type: object
       properties:
-        id:
+        userId:
           type: integer
           example: 1
-        login:
-          type: string
-          example: 'mariopuzo'
-        password:
-          type: string
-          example: 'mero314$'
         email:
           type: string
           example: 'acso@temp.pl'
         name:
           type: string
           example: 'Krystian'
-        surname:
-          type: string
-          example: 'Pieczarka'
-        phoneNumber:
-          type: string
-          example: '520449029'
-        createdAt:
+        createdTime:
           type: string
           format: data-time
           example: '2023-05-26T10:20:30'
@@ -602,43 +688,50 @@ components:
           type: string
           example: 'User'
         address:
-          type: object
-          properties:
-            city:
-              type: string
-              example: "Warszawa"
-            street:
-              type: string
-              example: "Zlota"
-            number:
-              type: number
-              example: 43
+          type: string
+          example: 'ul. Kosciuszki 20, 90-001 Lodz'
+        phoneNumber:
+          type: string
+          example: '502578994'
+        money:
+          type: integer
+          example: 132
+        loyaltyCard:
+          type: boolean
+          example: true
 
-    UserPost:
+    UserRequest:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
-        login:
-          type: string
-          example: 'mariopuzo'
-        password:
-          type: string
-          example: 'mero314$'
         email:
           type: string
           example: 'acso@temp.pl'
         name:
           type: string
           example: 'Krystian'
-        surname:
+        password:
           type: string
-          example: 'Pieczarka'
+          example: 'mero314$'
+        address:
+          type: string
+          example: 'ul. Kosciuszki 20, 90-001 Lodz'
         phoneNumber:
           type: string
-          example: '520449029'
-        createdAt:
+          example: '502578994'
+
+    UserRequestResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: 'acso@temp.pl'
+        name:
+          type: string
+          example: 'Krystian'
+        createdTime:
           type: string
           format: data-time
           example: '2023-05-26T10:20:30'
@@ -646,17 +739,76 @@ components:
           type: string
           example: 'User'
         address:
-          type: object
-          properties:
-            city:
-              type: string
-              example: "Warszawa"
-            street:
-              type: string
-              example: "Zlota"
-            number:
-              type: number
-              example: 43
+          type: string
+          example: 'ul. Kosciuszki 20, 90-001 Lodz'
+        phoneNumber:
+          type: string
+          example: '502578994'
+        money:
+          type: integer
+          example: 132
+        loyaltyCard:
+          type: boolean
+          example: true
+
+    UserResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: 'acso@temp.pl'
+        name:
+          type: string
+          example: 'Krystian'
+        createdTime:
+          type: string
+          format: data-time
+          example: '2023-05-26T10:20:30'
+        role:
+          type: string
+          example: 'User'
+        address:
+          type: string
+          example: 'ul. Kosciuszki 20, 90-001 Lodz'
+        phoneNumber:
+          type: string
+          example: '502578994'
+        money:
+          type: integer
+          example: 132
+        loyaltyCard:
+          type: boolean
+          example: true
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: 'acso@temp.pl'
+        password:
+          type: string
+          example: 'das#@f$fFFa!'
+
+    LoginRequestResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYXpAYWRtaW4ucGwiLCJpYXQiOjE2OTQ3MTk2NjYsImV4cCI6MTY5NDcyMTQ2Nn0.Xy_BHY2pbctM3GfWKywEkRJDJiO4Jq8-84H-ZSETGps'
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+          example: 'asdo12##'
+        newPassword:
+          type: string
+          example: 'PL039fad!#5gG'
 
     FoodListResponse:
       type: object

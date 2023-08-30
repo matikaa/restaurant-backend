@@ -11,7 +11,7 @@ public class JpaWrappedCategoryRepository implements CategoryRepository {
 
     private final CategoryJpaRepository categoryJpaRepository;
 
-    private final static CategoryRepositoryMapper categoryRepositoryMapper = CategoryRepositoryMapper.INSTANCE;
+    private static final CategoryRepositoryMapper categoryRepositoryMapper = CategoryRepositoryMapper.INSTANCE;
 
     public JpaWrappedCategoryRepository(CategoryJpaRepository categoryJpaRepository) {
         this.categoryJpaRepository = categoryJpaRepository;

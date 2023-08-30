@@ -34,7 +34,7 @@ class FoodControllerTest extends TestUseCase {
                 foodRequest,
                 FoodRequestResponse.class
         );
-        System.out.println("\n\n" + foodResponse.getBody() + "\n\n");
+
         //then
         assertThat(foodResponse.getStatusCode(), is(equalTo(CREATED)));
         assertThat(foodResponse.getBody(), is(notNullValue()));
@@ -98,7 +98,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodResponse = client.postForEntity(
-                prepareFoodUrlWithCategoryId(WRONG_CATEGORY_ID),
+                prepareFoodUrlWithCategoryId(WRONG_ID),
                 foodRequest,
                 FoodRequestResponse.class
         );
@@ -133,7 +133,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodRequestResponse = client.getForEntity(
-                prepareFoodUrlWithFoodId(
+                prepareFoodUrlWithFoodIdAndCategoryId(
                         savedCategory.categoryId(), foodResponse.getBody().foodId()),
                 FoodRequestResponse.class
         );
@@ -172,8 +172,8 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodRequestResponse = client.getForEntity(
-                prepareFoodUrlWithFoodId(
-                        WRONG_CATEGORY_ID, foodResponse.getBody().foodId()),
+                prepareFoodUrlWithFoodIdAndCategoryId(
+                        WRONG_ID, foodResponse.getBody().foodId()),
                 FoodRequestResponse.class
         );
 
@@ -207,8 +207,8 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodRequestResponse = client.getForEntity(
-                prepareFoodUrlWithFoodId(
-                        WRONG_CATEGORY_ID, foodResponse.getBody().foodId()),
+                prepareFoodUrlWithFoodIdAndCategoryId(
+                        WRONG_ID, foodResponse.getBody().foodId()),
                 FoodRequestResponse.class
         );
 
@@ -330,10 +330,10 @@ class FoodControllerTest extends TestUseCase {
         var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
 
         //when
-        client.delete(prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()));
+        client.delete(prepareFoodUrlWithFoodIdAndCategoryId(savedCategory.categoryId(), savedFood.foodId()));
 
         var contactDeleted = client.getForEntity(
-                prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()),
+                prepareFoodUrlWithFoodIdAndCategoryId(savedCategory.categoryId(), savedFood.foodId()),
                 FoodRequestResponse.class
         );
 
@@ -355,10 +355,10 @@ class FoodControllerTest extends TestUseCase {
         var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
 
         //when
-        client.delete(prepareFoodUrlWithFoodId(WRONG_CATEGORY_ID, savedFood.foodId()));
+        client.delete(prepareFoodUrlWithFoodIdAndCategoryId(WRONG_ID, savedFood.foodId()));
 
         var contactDeleted = client.getForEntity(
-                prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()),
+                prepareFoodUrlWithFoodIdAndCategoryId(savedCategory.categoryId(), savedFood.foodId()),
                 FoodRequestResponse.class
         );
 
@@ -383,10 +383,10 @@ class FoodControllerTest extends TestUseCase {
         var incorrectFoodId = -1L;
 
         //when
-        client.delete(prepareFoodUrlWithFoodId(savedCategory.categoryId(), incorrectFoodId));
+        client.delete(prepareFoodUrlWithFoodIdAndCategoryId(savedCategory.categoryId(), incorrectFoodId));
 
         var contactDeleted = client.getForEntity(
-                prepareFoodUrlWithFoodId(savedCategory.categoryId(), savedFood.foodId()),
+                prepareFoodUrlWithFoodIdAndCategoryId(savedCategory.categoryId(), savedFood.foodId()),
                 FoodRequestResponse.class
         );
 
@@ -425,7 +425,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var updatedFoodResponse = client.exchange(
-                prepareFoodUrlWithFoodId(savedCategory.categoryId(),
+                prepareFoodUrlWithFoodIdAndCategoryId(savedCategory.categoryId(),
                         foodResponse.getBody().foodId()),
                 PUT,
                 createBody(updateFoodRequest),
@@ -442,7 +442,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var foodRequestResponse = client.getForEntity(
-                prepareFoodUrlWithFoodId(
+                prepareFoodUrlWithFoodIdAndCategoryId(
                         savedCategory.categoryId(),
                         foodResponse.getBody().foodId()),
                 FoodRequestResponse.class
@@ -485,7 +485,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var updatedFoodResponse = client.exchange(
-                prepareFoodUrlWithFoodId(WRONG_CATEGORY_ID, foodResponse.getBody().foodId()),
+                prepareFoodUrlWithFoodIdAndCategoryId(WRONG_ID, foodResponse.getBody().foodId()),
                 PUT,
                 createBody(updateFoodRequest),
                 FoodResponse.class
@@ -526,7 +526,7 @@ class FoodControllerTest extends TestUseCase {
 
         //when
         var updatedFoodResponse = client.exchange(
-                prepareFoodUrlWithFoodId(savedCategory.categoryId(), wrongFoodId),
+                prepareFoodUrlWithFoodIdAndCategoryId(savedCategory.categoryId(), wrongFoodId),
                 PUT,
                 createBody(updateFoodRequest),
                 FoodResponse.class
