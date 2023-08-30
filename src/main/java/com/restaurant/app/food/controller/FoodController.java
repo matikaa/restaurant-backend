@@ -62,7 +62,7 @@ public class FoodController {
 
     @DeleteMapping("/{categoryId}/food/{foodId}")
     public ResponseEntity<Void> deleteFood(@PathVariable Long categoryId, @PathVariable Long foodId) {
-        if(!categoryService.existsByCategoryId(categoryId) || !foodService.existsByFoodId(foodId)) {
+        if(!foodService.existsByCategoryIdAndFoodId(categoryId, foodId)) {
             return ResponseEntity.notFound().build();
         }
 
@@ -73,7 +73,8 @@ public class FoodController {
     @PutMapping("/{categoryId}/food/{foodId}")
     public ResponseEntity<FoodResponse> updateFood(
             @PathVariable Long categoryId, @PathVariable Long foodId, @RequestBody FoodRequestUpdate foodRequestUpdate) {
-        if (!categoryService.existsByCategoryId(categoryId)) {
+
+        if(!foodService.existsByCategoryIdAndFoodId(categoryId, foodId)) {
             return ResponseEntity.notFound().build();
         }
 
