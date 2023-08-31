@@ -2,6 +2,7 @@ package com.restaurant.app.food.controller;
 
 import com.restaurant.app.category.service.CategoryService;
 import com.restaurant.app.food.controller.dto.*;
+import com.restaurant.app.food.controller.validator.FoodValidator;
 import com.restaurant.app.food.service.FoodService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,8 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/categories")
 public class FoodController {
 
+    private final FoodValidator foodValidator;
+
     private final FoodService foodService;
 
     private final CategoryService categoryService;
@@ -21,6 +24,7 @@ public class FoodController {
     private static final FoodControllerMapper foodControllerMapper = FoodControllerMapper.INSTANCE;
 
     public FoodController(FoodService foodService, CategoryService categoryService) {
+        this.foodValidator = new FoodValidator();
         this.foodService = foodService;
         this.categoryService = categoryService;
     }
@@ -36,7 +40,7 @@ public class FoodController {
 
     @GetMapping("/{categoryId}/food/{foodId}")
     public ResponseEntity<FoodResponse> getFoodByCategoryIdAndFoodId(@PathVariable Long categoryId,
-                                                                            @PathVariable Long foodId) {
+                                                                     @PathVariable Long foodId) {
         return foodService.getFoodByCategoryIdAndFoodId(categoryId, foodId)
                 .map(foodControllerMapper::foodToFoodResponse)
                 .map(food -> ResponseEntity.ok().body(food))
@@ -47,6 +51,10 @@ public class FoodController {
     public ResponseEntity<FoodRequestResponse> addFood(@PathVariable Long categoryId, @RequestBody FoodRequest foodRequest) {
         if (!categoryService.existsByCategoryId(categoryId)) {
             return ResponseEntity.notFound().build();
+        }
+
+        if (foodValidator.isFoodRequestNotValid(foodRequest)) {
+            return ResponseEntity.badRequest().build();
         }
 
         if (foodService.existsByPositionId(categoryId, foodRequest.positionId())) {
@@ -62,7 +70,7 @@ public class FoodController {
 
     @DeleteMapping("/{categoryId}/food/{foodId}")
     public ResponseEntity<Void> deleteFood(@PathVariable Long categoryId, @PathVariable Long foodId) {
-        if(!foodService.existsByCategoryIdAndFoodId(categoryId, foodId)) {
+        if (!foodService.existsByCategoryIdAndFoodId(categoryId, foodId)) {
             return ResponseEntity.notFound().build();
         }
 
@@ -73,9 +81,13 @@ public class FoodController {
     @PutMapping("/{categoryId}/food/{foodId}")
     public ResponseEntity<FoodResponse> updateFood(
             @PathVariable Long categoryId, @PathVariable Long foodId, @RequestBody FoodRequestUpdate foodRequestUpdate) {
-
-        if(!foodService.existsByCategoryIdAndFoodId(categoryId, foodId)) {
+        if (!foodService.existsByCategoryIdAndFoodId(categoryId, foodId) ||
+                foodValidator.isFoodRequestUpdateNotValid(foodRequestUpdate)) {
             return ResponseEntity.notFound().build();
+        }
+
+        if (foodValidator.isFoodRequestUpdateNotValid(foodRequestUpdate)) {
+            return ResponseEntity.badRequest().build();
         }
 
         var food = foodService.getFoodByCategoryIdAndFoodId(categoryId, foodId);

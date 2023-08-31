@@ -3,6 +3,7 @@ package com.restaurant.app.contact.controller;
 import com.restaurant.app.contact.controller.dto.ContactRequest;
 import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
 import com.restaurant.app.contact.controller.dto.ContactResponse;
+import com.restaurant.app.contact.controller.validator.ContactValidator;
 import com.restaurant.app.contact.service.ContactService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +15,13 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("/contact")
 public class ContactController {
 
+    private final ContactValidator contactValidator;
+
     private static final ContactControllerMapper contactControllerMapper = ContactControllerMapper.INSTANCE;
     private final ContactService contactService;
 
     public ContactController(ContactService contactService) {
+        this.contactValidator = new ContactValidator();
         this.contactService = contactService;
     }
 
@@ -30,7 +34,11 @@ public class ContactController {
 
     @PostMapping
     public ResponseEntity<ContactRequestResponse> addContact(@RequestBody ContactRequest contactRequest) {
-        if(contactService.existsAny()){
+        if (contactValidator.isContactRequestNotValid(contactRequest)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (contactService.existsAny()) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -42,14 +50,18 @@ public class ContactController {
     @PutMapping("/{contactId}")
     public ResponseEntity<ContactResponse> updateContact(@PathVariable Long contactId,
                                                          @RequestBody ContactRequest contactRequest) {
+        if (contactValidator.isContactRequestNotValid(contactRequest)) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return contactService.update(contactControllerMapper.contactRequestToContact(contactRequest, contactId))
                 .map(contact -> ResponseEntity.ok().body(contactControllerMapper.contactToContactResponse(contact)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{contactId}")
-    public ResponseEntity<Void> deleteContact(@PathVariable Long contactId){
-        if(!contactService.existsById(contactId)) {
+    public ResponseEntity<Void> deleteContact(@PathVariable Long contactId) {
+        if (!contactService.existsById(contactId)) {
             return ResponseEntity.notFound().build();
         }
 

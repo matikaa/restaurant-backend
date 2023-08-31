@@ -5,7 +5,7 @@ import com.restaurant.app.contact.service.dto.Contact;
 
 import java.util.Optional;
 
-public class BaseContactService implements ContactService{
+public class BaseContactService implements ContactService {
 
     private static final ContactServiceMapper contactServiceMapper = ContactServiceMapper.INSTANCE;
 
@@ -28,23 +28,23 @@ public class BaseContactService implements ContactService{
     }
 
     @Override
-    public Optional<Contact> update(Contact contact){
+    public Optional<Contact> update(Contact contact) {
         return contactRepository.update(contactServiceMapper.contactToContactModel(contact))
                 .map(contactServiceMapper::contactModelToContact);
     }
 
     @Override
-    public void delete(Long contactId){
+    public void delete(Long contactId) {
         contactRepository.delete(contactId);
     }
 
     @Override
-    public Boolean existsById(Long contactId){
+    public Boolean existsById(Long contactId) {
         return contactRepository.existsById(contactId);
     }
 
     @Override
-    public Boolean existsAny(){
+    public Boolean existsAny() {
         return contactRepository.existsAny();
     }
 }

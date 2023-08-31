@@ -49,7 +49,7 @@ public class BaseFoodService implements FoodService {
     }
 
     @Override
-    public Optional<Food> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId){
+    public Optional<Food> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId) {
         return foodRepository.getFoodByCategoryIdAndFoodId(categoryId, foodId)
                 .map(foodServiceMapper::foodModelToFood);
     }

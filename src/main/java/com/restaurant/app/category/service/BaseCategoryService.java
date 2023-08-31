@@ -8,7 +8,7 @@ import com.restaurant.app.category.service.dto.Category;
 import java.util.List;
 import java.util.Optional;
 
-public class BaseCategoryService implements CategoryService{
+public class BaseCategoryService implements CategoryService {
 
     private static final CategoryServiceMapper categoryServiceMapper = CategoryServiceMapper.INSTANCE;
     private final CategoryRepository categoryRepository;
