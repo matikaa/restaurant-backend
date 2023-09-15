@@ -361,6 +361,67 @@ paths:
         '409':
           description: User already exists
 
+  /users/{userId}/password:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Change any user password by admin
+      description: |
+        **Change password by admin**
+
+        Allowed roles: ```ADMIN```
+      operationId: changeAnyUserPassword
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      requestBody:
+        description: Enter current and new password by user.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserChangePasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: Password changed
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: User not exists
+
+  /users/{userId}/delete:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Delete user account by admin
+      description: |
+        **Change user details**
+
+        Allowed roles: ```ADMIN```
+      operationId: deleteUserByAdmin
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: User was deleted successfully
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: User was not found
+
   /users/{userId}:
     get:
       tags:
@@ -460,6 +521,61 @@ paths:
           description: User does not have permissions to access that resource
         '409':
           description: Wrong password or new is the same as old
+
+  /users/me:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Change user details
+      description: |
+        **Change user details**
+
+        Allowed roles: ```ADMIN```, ```USER```
+      operationId: updateUserDetails
+      requestBody:
+        description: Change name, address, phone.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+        required: true
+      responses:
+        '200':
+          description: User was updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '403':
+          description: User does not have permissions to access that resource
+
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Delete user account
+      description: |
+        **Change user details**
+
+        Allowed roles: ```USER```
+      operationId: deleteAccount
+      requestBody:
+        description: Confirm user by password.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: User was deleted successfully
+        '400':
+          description: Wrong password
+        '403':
+          description: User does not have permissions to access that resource
 
   /contact:
     post:
@@ -808,6 +924,33 @@ components:
         newPassword:
           type: string
           example: 'PL039fad!#5gG'
+
+    UserChangePasswordRequest:
+      type: object
+      properties:
+        newPassword:
+          type: string
+          example: 'PL039fad!#5gG'
+
+    PasswordRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          example: 'asdo12##'
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Mario'
+        address:
+          type: string
+          example: 'Aleje politechniki 13, 90-508 Lodz'
+        phoneNumber:
+          type: string
+          example: '532805003'
 
     FoodResponse:
       type: object

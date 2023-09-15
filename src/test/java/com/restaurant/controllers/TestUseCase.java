@@ -68,7 +68,10 @@ public class TestUseCase {
     protected static final String USER_PATH = USER_RESOURCE + "/%d";
     protected static final String LOGIN_PATH = USER_RESOURCE + "/login";
     protected static final String LOGOUT_PATH = USER_RESOURCE + "/logout";
-    protected static final String PASSWORD_PATH = USER_RESOURCE + "/password";
+    protected static final String PROFILE_USER_PATH = USER_RESOURCE + "/me";
+    protected static final String PASSWORD_PATH = PROFILE_USER_PATH + "/password";
+    protected static final String ADMIN_PASSWORD_PATH = "/password";
+    protected static final String DELETE_USER_PATH = "/delete";
 
     protected CategoryRequestResponse saveCategory(String categoryName, Long positionId) {
         //given
@@ -192,6 +195,14 @@ public class TestUseCase {
 
     protected String prepareUserUrlWithUserId(Long userId) {
         return prepareUrl(String.format(USER_PATH, userId));
+    }
+
+    protected String prepareUserPasswordUrlWithUserId(Long userId) {
+        return prepareUrl(String.format(USER_PATH, userId) + ADMIN_PASSWORD_PATH);
+    }
+
+    protected String prepareUserDeleteUrlWithUserId(Long userId) {
+        return prepareUrl(String.format(USER_PATH, userId) + DELETE_USER_PATH);
     }
 
     protected String prepareCategoryUrlWithCategoryId(Long categoryId) {

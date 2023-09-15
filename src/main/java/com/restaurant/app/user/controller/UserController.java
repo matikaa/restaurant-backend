@@ -107,21 +107,97 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/password")
+    @PutMapping("/me")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<UserResponse> updateUserDetails(@RequestBody UpdateUserRequest updateUserRequest) {
+        if (userValidator.isUpdateUserRequestNotValid(updateUserRequest)) {
+            LOGGER.warn(INVALID_REQUEST_BODY);
+            return ResponseEntity.badRequest().build();
+        }
+
+        var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        var changedUser = userService.changeUserDetails(userEmail, updateUserRequest);
+        if (!changedUser.isPresent()) {
+            LOGGER.warn(USER_NOT_EXISTS);
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(userControllerMapper.userToUserResponse(changedUser.get()));
+    }
+
+    @PostMapping("/me")
+    @PreAuthorize("hasAuthority('USER')")
+    @Transactional
+    public ResponseEntity<Void> deleteAccount(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+                                              @RequestBody PasswordRequest passwordRequest) {
+        if (userValidator.isPasswordRequestNotValid(passwordRequest)) {
+            LOGGER.warn(INVALID_REQUEST_BODY);
+            return ResponseEntity.badRequest().build();
+        }
+        var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!userService.verifyPassword(userEmail, passwordRequest.password())) {
+            LOGGER.warn(INCORRECT_PASSWORD);
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!userService.existsUserByEmail(userEmail)) {
+            LOGGER.warn(USER_NOT_EXISTS);
+            ResponseEntity.notFound().build();
+        }
+
+        userService.logout(authorizationHeader);
+        userService.deleteByEmail(userEmail);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{userId}/delete")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> deleteUserByAdmin(@PathVariable Long userId) {
+        if (!userService.existsByUserId(userId)) {
+            LOGGER.warn(USER_NOT_EXISTS);
+            return ResponseEntity.notFound().build();
+        }
+
+        userService.deleteUser(userId);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    @PutMapping("/me/password")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         if (userValidator.isChangePasswordRequestNotValid(changePasswordRequest)) {
             LOGGER.warn(INVALID_REQUEST_BODY);
             return ResponseEntity.badRequest().build();
         }
-        var userMail = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        var changedPassword = userService.changeUserPassword(
-                userMail, changePasswordRequest);
+        var changedPassword = userService.changePassword(
+                userEmail, changePasswordRequest);
 
         if (!changedPassword) {
             LOGGER.warn(INCORRECT_PASSWORD);
             return ResponseEntity.status(CONFLICT).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{userId}/password")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> changeAnyUserPassword(@PathVariable Long userId,
+                                                      @RequestBody UserChangePasswordRequest userChangePasswordRequest) {
+        if (userValidator.isUserChangePasswordRequestNotValid(userChangePasswordRequest)) {
+            LOGGER.warn(INVALID_REQUEST_BODY);
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!userService.changeUserPassword(userId, userChangePasswordRequest)) {
+            LOGGER.warn(USER_NOT_EXISTS);
+            return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok().build();

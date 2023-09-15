@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpEntity.EMPTY;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.*;
 
@@ -430,5 +431,241 @@ class UserControllerTest extends TestUseCase {
 
         //then
         assertThat(changedPasswordResponse.getStatusCode(), is(equalTo(CONFLICT)));
+    }
+
+    @Test
+    @DisplayName("Should update user details and return 200 OK")
+    void shouldUpdateUserDetailsAndReturnOk() {
+        //given
+        var email = "jackie.frank@gmail.com";
+        var name = "Jack";
+        var password = "koK03DL1$";
+        var address = "Aleje Jerozolimskie 13, 87-304 Warszawa";
+        var phoneNumber = "850239003";
+        var newName = "Manio";
+        var newPhoneNumber = "623904013";
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        saveUser(createUserRequest);
+
+        var updateUserRequest = new UpdateUserRequest(newName, address, newPhoneNumber);
+
+        runAsAdmin();
+        //when
+
+        var userResponse = client.exchange(
+                prepareUrl(PROFILE_USER_PATH),
+                PUT,
+                createBody(updateUserRequest),
+                UserResponse.class
+        );
+
+        //then
+        assertThat(userResponse.getStatusCode(), is(equalTo(OK)));
+        assertThat(userResponse.getBody(), is(notNullValue()));
+        assertThat(userResponse.getBody().name(), is(newName));
+        assertThat(userResponse.getBody().address(), is(address));
+        assertThat(userResponse.getBody().phoneNumber(), is(newPhoneNumber));
+    }
+
+    @Test
+    @DisplayName("Should delete user account and return 200 OK")
+    void shouldDeleteUserAccountAndReturnOk() {
+        //given
+        var email = "jacob.smith@gmail.com";
+        var name = "Jacob";
+        var password = "003l#LDA$%";
+        var address = "Reymonta 94, 80-244 Wroclaw";
+        var phoneNumber = "589030874";
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        var createdUser = saveUser(createUserRequest);
+
+        var passwordRequest = new PasswordRequest(password);
+
+        runAsUserWithData(email, password);
+        //when
+
+        var deleteResponse = client.postForEntity(
+                prepareUrl(PROFILE_USER_PATH),
+                createBody(passwordRequest),
+                Void.class
+        );
+
+        //then
+        assertThat(deleteResponse.getStatusCode(), is(equalTo(OK)));
+
+        //when
+        runAsAdmin();
+        var userResponse = client.getForEntity(
+                prepareUserUrlWithUserId(createdUser.userId()),
+                UserResponse.class
+        );
+
+        //then
+        assertThat(userResponse.getStatusCode(), is(equalTo(NOT_FOUND)));
+    }
+
+    @Test
+    @DisplayName("Should not delete user account by wrong password and return 400 BAD REQUEST")
+    void shouldNotDeleteUserAccountByWrongPasswordAndReturnBadRequest() {
+        //given
+        var email = "andrzej.smith@gmail.com";
+        var name = "Andrzej";
+        var password = "dfw@@!#2023";
+        var wrongPassword = "kodas#!3fF";
+        var address = "ul. Slowackiego 18, 90-001 Lodz";
+        var phoneNumber = "524254526";
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        saveUser(createUserRequest);
+
+        var passwordRequest = new PasswordRequest(wrongPassword);
+
+        runAsUserWithData(email, password);
+        //when
+
+        var deleteResponse = client.postForEntity(
+                prepareUrl(PROFILE_USER_PATH),
+                createBody(passwordRequest),
+                Void.class
+        );
+
+        //then
+        assertThat(deleteResponse.getStatusCode(), is(equalTo(BAD_REQUEST)));
+    }
+
+    @Test
+    @DisplayName("Should delete user account by userId and return 200 OK")
+    void shouldDeleteUserAccountByUserIdAndReturnOk() {
+        //given
+        var email = "jan.kowalski@example.com";
+        var name = "Jan";
+        var password = "dfge562023!";
+        var address = "ul. Mickiewicza 5, 30-059 Krakow";
+        var phoneNumber = "555666777";
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        var createdUser = saveUser(createUserRequest);
+
+        runAsAdmin();
+        //when
+
+        var deleteResponse = client.postForEntity(
+                prepareUserDeleteUrlWithUserId(createdUser.userId()),
+                EMPTY,
+                Void.class
+        );
+
+        //then
+        assertThat(deleteResponse.getStatusCode(), is(equalTo(OK)));
+
+        //when
+        var userResponse = client.getForEntity(
+                prepareUserUrlWithUserId(createdUser.userId()),
+                UserResponse.class
+        );
+
+        //then
+        assertThat(userResponse.getStatusCode(), is(equalTo(NOT_FOUND)));
+    }
+
+    @Test
+    @DisplayName("Should not delete user account by wrong userId and return 404 NOT FOUND")
+    void shouldNotDeleteUserAccountByWrongUserIdAndReturnNotFound() {
+        //given
+        var email = "marek.mostowiak@outlook.com";
+        var name = "Marek";
+        var password = "fjsoi4#3!";
+        var address = "ul. Wlokniarzy 34, 90-502 Lodz";
+        var phoneNumber = "435549055";
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        var createdUser = saveUser(createUserRequest);
+
+        runAsAdmin();
+        //when
+
+        var deleteResponse = client.postForEntity(
+                prepareUserDeleteUrlWithUserId(WRONG_ID),
+                EMPTY,
+                Void.class
+        );
+
+        //then
+        assertThat(deleteResponse.getStatusCode(), is(equalTo(NOT_FOUND)));
+    }
+
+    @Test
+    @DisplayName("Should change user password by userId and return 200 OK")
+    void shouldChangeUserPasswordByUserIdAndReturnOk() {
+        //given
+        var email = "anna.nowak@example.com";
+        var name = "Anna";
+        var password = "dpksao3@$@44";
+        var address = "ul. Kwiatowa 12, 00-123 Warszawa";
+        var phoneNumber = "123456789";
+        var newPassword = "sda$@$daSDA2#";
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        var createdUser = saveUser(createUserRequest);
+
+        var userChangedPasswordRequest = new UserChangePasswordRequest(newPassword);
+
+        //when
+        runAsAdmin();
+
+        var changedPasswordResponse = client.exchange(
+                prepareUserPasswordUrlWithUserId(createdUser.userId()),
+                PUT,
+                createBody(userChangedPasswordRequest),
+                Void.class
+        );
+
+        //then
+        assertThat(changedPasswordResponse.getStatusCode(), is(equalTo(OK)));
+
+        //given
+        var loginRequest = new LoginRequest(email, newPassword);
+
+        //when
+        var loginResponse = client.postForEntity(
+                prepareUrl(LOGIN_PATH),
+                loginRequest,
+                String.class
+        );
+
+        //then
+        assertThat(loginResponse.getStatusCode(), is(equalTo(OK)));
+    }
+
+    @Test
+    @DisplayName("Should not change user password by wrong userId and return 404 NOT FOUND")
+    void shouldNotChangeUserPasswordByWrongUserIdAndReturnNotFound() {
+        //given
+        var email = "anna.nowak@example.com";
+        var name = "Anna";
+        var password = "dpksao3@$@44";
+        var address = "ul. Kwiatowa 12, 00-123 Warszawa";
+        var phoneNumber = "123456789";
+        var newPassword = "sda$@$daSDA2#";
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        saveUser(createUserRequest);
+
+        var userChangedPasswordRequest = new UserChangePasswordRequest(newPassword);
+
+        //when
+        runAsAdmin();
+
+        var changedPasswordResponse = client.exchange(
+                prepareUserPasswordUrlWithUserId(WRONG_ID),
+                PUT,
+                createBody(userChangedPasswordRequest),
+                Void.class
+        );
+
+        //then
+        assertThat(changedPasswordResponse.getStatusCode(), is(equalTo(NOT_FOUND)));
     }
 }

@@ -3,6 +3,8 @@ package com.restaurant.app.user.service;
 import com.restaurant.app.jwt.service.JwtService;
 import com.restaurant.app.user.controller.LoginRequest;
 import com.restaurant.app.user.controller.dto.ChangePasswordRequest;
+import com.restaurant.app.user.controller.dto.UpdateUserRequest;
+import com.restaurant.app.user.controller.dto.UserChangePasswordRequest;
 import com.restaurant.app.user.controller.dto.UserRequest;
 import com.restaurant.app.user.repository.UserRepository;
 import com.restaurant.app.user.service.dto.User;
@@ -58,7 +60,7 @@ public class BaseUserService implements UserService {
                 userRequest.password(), userRequest.address(), userRequest.phoneNumber());
 
         var userModelToSave = userServiceMapper.userRequestToUserModel(fixedUserRequest)
-                .modifiedUser(passwordEncoder.encode(fixedUserRequest.password()));
+                .newUser(passwordEncoder.encode(fixedUserRequest.password()));
 
         return userServiceMapper.userModelToUser(
                 userRepository.save(userModelToSave));
@@ -74,6 +76,22 @@ public class BaseUserService implements UserService {
     }
 
     @Override
+    public Optional<User> changeUserDetails(String email, UpdateUserRequest updateUserRequest) {
+        return userRepository.changeUser(email, updateUserRequest)
+                .map(userServiceMapper::userModelToUser);
+    }
+
+    @Override
+    public void deleteByEmail(String email) {
+        userRepository.deleteByUserEmail(email);
+    }
+
+    @Override
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    @Override
     public String generateToken(String email) {
         return jwtService.generateToken(email);
     }
@@ -85,9 +103,34 @@ public class BaseUserService implements UserService {
     }
 
     @Override
-    public boolean changeUserPassword(String email, ChangePasswordRequest changePasswordRequest) {
-        if (userRepository.existsByEmail(email) && isCorrectPassword(email, changePasswordRequest)) {
+    public boolean changePassword(String email, ChangePasswordRequest changePasswordRequest) {
+        if (userRepository.existsByEmail(email) && validPasswords(email, changePasswordRequest)) {
             userRepository.changePassword(email, passwordEncoder.encode(changePasswordRequest.newPassword()));
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean changeUserPassword(Long userId, UserChangePasswordRequest userChangePasswordRequest) {
+        if (existsByUserId(userId)) {
+            var foundUser = userRepository.findById(userId);
+            if (foundUser.isPresent()) {
+                userRepository.changePassword(
+                        foundUser.get().email(),
+                        passwordEncoder.encode(userChangePasswordRequest.newPassword()));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean verifyPassword(String email, String currentPassword) {
+        var password = userRepository.getCurrentPassword(email);
+        if (!password.isEmpty() && passwordEncoder.matches(currentPassword, password)) {
             return true;
         }
 
@@ -99,10 +142,10 @@ public class BaseUserService implements UserService {
         return userRepository.existsByEmail(email);
     }
 
-    private boolean isCorrectPassword(String email, ChangePasswordRequest changePasswordRequest) {
+    private boolean validPasswords(String email, ChangePasswordRequest changePasswordRequest) {
         var password = userRepository.getCurrentPassword(email);
 
-        if (!password.isEmpty() && passwordEncoder.matches(changePasswordRequest.currentPassword(), password) &&
+        if (!password.isEmpty() && verifyPassword(email, changePasswordRequest.currentPassword()) &&
                 !passwordEncoder.matches(changePasswordRequest.newPassword(), password)) {
             return true;
         }

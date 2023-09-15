@@ -1,5 +1,6 @@
 package com.restaurant.app.user.repository;
 
+import com.restaurant.app.user.controller.dto.UpdateUserRequest;
 import com.restaurant.app.user.repository.dto.UserModel;
 
 import java.util.List;
@@ -57,6 +58,31 @@ public class JpaWrappedUserRepository implements UserRepository {
                     .map(userRepositoryMapper::userModelToUserEntity)
                     .map(userJpaRepository::save);
         }
+    }
+
+    @Override
+    public Optional<UserModel> changeUser(String email, UpdateUserRequest updateUserRequest) {
+        if (existsByEmail(email)) {
+            return userJpaRepository.findByEmail(email)
+                    .map(userRepositoryMapper::userEntityToUserModel)
+                    .map(user -> user.modifiedUser(updateUserRequest))
+                    .map(userRepositoryMapper::userModelToUserEntity)
+                    .map(userJpaRepository::save)
+                    .map(userRepositoryMapper::userEntityToUserModel);
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public void deleteByUserEmail(String email) {
+        userJpaRepository.findByEmail(email)
+                .ifPresent(userJpaRepository::delete);
+    }
+
+    @Override
+    public void deleteById(Long userId) {
+        userJpaRepository.deleteById(userId);
     }
 
     @Override
