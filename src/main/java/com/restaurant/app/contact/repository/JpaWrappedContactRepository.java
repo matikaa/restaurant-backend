@@ -40,12 +40,12 @@ public class JpaWrappedContactRepository implements ContactRepository {
     }
 
     @Override
-    public Boolean existsById(Long contactId) {
+    public boolean existsById(Long contactId) {
         return contactJpaRepository.existsById(contactId);
     }
 
     @Override
-    public Boolean existsAny() {
+    public boolean existsAny() {
         return !contactJpaRepository.findAll().isEmpty();
     }
 }

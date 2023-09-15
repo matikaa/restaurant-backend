@@ -39,12 +39,12 @@ public class BaseContactService implements ContactService {
     }
 
     @Override
-    public Boolean existsById(Long contactId) {
+    public boolean existsById(Long contactId) {
         return contactRepository.existsById(contactId);
     }
 
     @Override
-    public Boolean existsAny() {
+    public boolean existsAny() {
         return contactRepository.existsAny();
     }
 }

@@ -53,7 +53,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -76,7 +76,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -107,7 +107,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(WRONG_CATEGORY_ID),
+                prepareCategoryUrlWithCategoryId(WRONG_ID),
                 CategoryResponse.class
         );
 
@@ -124,7 +124,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -137,12 +137,12 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         client.delete(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
         getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -159,7 +159,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -172,12 +172,12 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         client.delete(
-                categoryPath(WRONG_CATEGORY_ID),
+                prepareCategoryUrlWithCategoryId(WRONG_ID),
                 CategoryResponse.class
         );
 
         getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -201,7 +201,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -214,7 +214,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var updatedCategoryResponse = client.exchange(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 PUT,
                 createBody(updatedCategory),
                 CategoryResponse.class
@@ -229,7 +229,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -253,7 +253,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var getCategoryResponse = client.getForEntity(
-                categoryPath(savedCategory.categoryId()),
+                prepareCategoryUrlWithCategoryId(savedCategory.categoryId()),
                 CategoryResponse.class
         );
 
@@ -266,7 +266,7 @@ class CategoryControllerTestUseCase extends TestUseCase {
 
         //when
         var updatedCategoryResponse = client.exchange(
-                categoryPath(WRONG_CATEGORY_ID),
+                prepareCategoryUrlWithCategoryId(WRONG_ID),
                 PUT,
                 createBody(updatedCategory),
                 CategoryResponse.class

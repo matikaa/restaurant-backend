@@ -5,9 +5,6 @@ import com.restaurant.app.category.controller.dto.UpdateCategoryRequest;
 
 public class CategoryValidator {
 
-    public CategoryValidator() {
-    }
-
     public boolean isCategoryRequestNotValid(CategoryRequest categoryRequest) {
         return !(categoryRequest instanceof CategoryRequest) ||
                 categoryRequest.categoryName() == null || categoryRequest.categoryName().trim().isEmpty()

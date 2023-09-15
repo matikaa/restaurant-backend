@@ -4,9 +4,6 @@ import com.restaurant.app.contact.controller.dto.ContactRequest;
 
 public class ContactValidator {
 
-    public ContactValidator() {
-    }
-
     public boolean isContactRequestNotValid(ContactRequest contactRequest) {
         return !(contactRequest instanceof ContactRequest) ||
                 contactRequest.contactMail() == null || contactRequest.contactMail().trim().isEmpty() ||

@@ -8,8 +8,12 @@ import com.restaurant.app.contact.controller.dto.ContactRequest;
 import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
 import com.restaurant.app.food.controller.dto.FoodRequest;
 import com.restaurant.app.food.controller.dto.FoodRequestResponse;
-
 import com.restaurant.app.food.controller.dto.FoodRequestUpdate;
+import com.restaurant.app.user.controller.LoginRequest;
+import com.restaurant.app.user.controller.dto.LoginRequestResponse;
+import com.restaurant.app.user.controller.dto.UserRequest;
+import com.restaurant.app.user.controller.dto.UserRequestResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -18,9 +22,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.Collections;
+
+import static com.restaurant.app.response.StateValues.TOKEN_PREFIX;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -33,16 +41,34 @@ public class TestUseCase {
     @LocalServerPort
     protected int port;
 
-    protected static final Long WRONG_CATEGORY_ID = -1L;
-    protected static final String CONTACT_URL = "/contact";
+    private String userToken;
+
+    private String adminToken;
+
+    private static final String USER_EMAIL = "mariuszek@user.pl";
+    private static final String USER_PASSWORD = "user";
+    private static final String ADMIN_EMAIL = "pro8l@admin.pl";
+    private static final String ADMIN_PASSWORD = "admin";
+
+    protected static final String BASE_URL = "http://localhost:%d%s";
     protected static final Long POSITION_ID = 1L;
+
+    protected static final Long WRONG_ID = -1L;
     protected static final String CATEGORY_RESOURCE = "/categories";
-    protected static final String FOOD_URL = "/food";
-    protected static final String FOOD_GET_URL = "/food/%d";
     protected static final String CATEGORY_PATH = CATEGORY_RESOURCE + "/%d";
 
-    private static final String GET_CONTACT_URL = CONTACT_URL + "/%d";
-    private static final String BASE_URL = "http://localhost:%d%s";
+    protected static final String FOOD_RESOURCE = "/food";
+    protected static final String FOOD_PATH = FOOD_RESOURCE + "/%d";
+
+    protected static final String CONTACT_RESOURCE = "/contact";
+    protected static final String CONTACT_PATH = CONTACT_RESOURCE + "/%d";
+
+    protected static final String USER_ROLE = "USER";
+    protected static final String USER_RESOURCE = "/users";
+    protected static final String USER_PATH = USER_RESOURCE + "/%d";
+    protected static final String LOGIN_PATH = USER_RESOURCE + "/login";
+    protected static final String LOGOUT_PATH = USER_RESOURCE + "/logout";
+    protected static final String PASSWORD_PATH = USER_RESOURCE + "/password";
 
     protected CategoryRequestResponse saveCategory(String categoryName, Long positionId) {
         //given
@@ -85,28 +111,91 @@ public class TestUseCase {
         return new UpdateCategoryRequest(positionId, categoryName);
     }
 
+    @BeforeEach
+    public void login() {
+        userToken = getToken(USER_EMAIL, USER_PASSWORD);
+        adminToken = getToken(ADMIN_EMAIL, ADMIN_PASSWORD);
+    }
+
+    private String getToken(String email, String password) {
+        var loginRequest = new LoginRequest(email, password);
+        var userToken = client.postForEntity(
+                prepareUrl(LOGIN_PATH),
+                loginRequest,
+                LoginRequestResponse.class
+        );
+
+        assertThat(userToken.getStatusCode(), is(equalTo(OK)));
+        assertThat(userToken.getBody(), is(notNullValue()));
+
+        return userToken.getBody().token();
+    }
+
+    protected void runAsAdmin() {
+        addToken(adminToken);
+    }
+
+    protected void runAsUser() {
+        addToken(userToken);
+    }
+
+    protected void runAsUserWithData(String email, String password) {
+        var token = getToken(email, password);
+        addToken(token);
+    }
+
+    protected void addToken(String token) {
+        client.getRestTemplate().setInterceptors(
+                Collections.singletonList((request, body, execution) -> {
+                    request.getHeaders().add("Authorization",
+                            String.format("%s%s", TOKEN_PREFIX, token));
+                    return execution.execute(request, body);
+                })
+        );
+    }
+
+    protected UserRequestResponse createUser(UserRequest userRequest) {
+        //when
+        var userResponse = client.postForEntity(
+                prepareUrl(USER_RESOURCE),
+                userRequest,
+                UserRequestResponse.class
+        );
+
+        //then
+        assertThat(userResponse.getStatusCode(), is(equalTo(CREATED)));
+        assertThat(userResponse.getBody(), is(notNullValue()));
+        assertThat(userResponse.getBody().email(), is(equalTo(userRequest.email())));
+        assertThat(userResponse.getBody().name(), is(equalTo(userRequest.name())));
+        assertThat(userResponse.getBody().role(), is(equalTo(USER_ROLE)));
+        assertThat(userResponse.getBody().address(), is(equalTo(userRequest.address())));
+        assertThat(userResponse.getBody().phoneNumber(), is(equalTo(userRequest.phoneNumber())));
+
+        return userResponse.getBody();
+    }
+
     protected String prepareUrl(String resource) {
         return String.format(BASE_URL, port, resource);
     }
 
-    protected String prepareFoodUrlWithoutFoodId() {
-        return prepareUrl(CATEGORY_RESOURCE + FOOD_URL);
-    }
-
     protected String prepareFoodUrlWithCategoryId(Long categoryId) {
-        return prepareUrl(String.format(CATEGORY_PATH, categoryId) + FOOD_URL);
+        return prepareUrl(String.format(CATEGORY_PATH, categoryId) + FOOD_RESOURCE);
     }
 
-    protected String prepareFoodUrlWithFoodId(Long categoryId, Long foodId) {
-        return categoryPath(categoryId) + String.format(FOOD_GET_URL, foodId);
+    protected String prepareFoodUrlWithFoodIdAndCategoryId(Long categoryId, Long foodId) {
+        return prepareCategoryUrlWithCategoryId(categoryId) + String.format(FOOD_PATH, foodId);
     }
 
-    protected String categoryPath(Long categoryId) {
+    protected String prepareUserUrlWithUserId(Long userId) {
+        return prepareUrl(String.format(USER_PATH, userId));
+    }
+
+    protected String prepareCategoryUrlWithCategoryId(Long categoryId) {
         return prepareUrl(String.format(CATEGORY_PATH, categoryId));
     }
 
-    protected String prepareGetContactUrl(Long id) {
-        return prepareUrl(String.format(GET_CONTACT_URL, id));
+    protected String prepareContactUrlWithContactId(Long contactId) {
+        return prepareUrl(String.format(CONTACT_PATH, contactId));
     }
 
     protected ContactRequest createContactRequest() {
@@ -128,8 +217,8 @@ public class TestUseCase {
 
         //when
         var contactRequestResponse = client.postForEntity(
-                prepareUrl(CONTACT_URL),
-                createContactRequest(),
+                prepareUrl(CONTACT_RESOURCE),
+                contactRequest,
                 ContactRequestResponse.class);
 
         //then
