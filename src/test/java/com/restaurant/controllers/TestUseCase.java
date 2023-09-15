@@ -24,7 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.Collections;
 
-import static com.restaurant.app.response.StateValues.TOKEN_PREFIX;
+import static com.restaurant.app.response.ConstantValues.TOKEN_PREFIX;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -74,6 +74,8 @@ public class TestUseCase {
         //given
         var createCategoryRequest = new CategoryRequest(positionId, categoryName);
 
+        runAsAdmin();
+
         //when
         var createCategoryResponse = client.postForEntity(
                 prepareUrl(CATEGORY_RESOURCE),
@@ -93,6 +95,8 @@ public class TestUseCase {
 
     protected FoodRequestResponse saveFood(Long categoryId, String foodName, Integer foodPrice, Long foodPositionId) {
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
+
+        runAsAdmin();
 
         //when
         var foodResponse = client.postForEntity(
@@ -154,7 +158,7 @@ public class TestUseCase {
         );
     }
 
-    protected UserRequestResponse createUser(UserRequest userRequest) {
+    protected UserRequestResponse saveUser(UserRequest userRequest) {
         //when
         var userResponse = client.postForEntity(
                 prepareUrl(USER_RESOURCE),
@@ -214,6 +218,8 @@ public class TestUseCase {
     protected ContactRequestResponse saveContact() {
         //given
         var contactRequest = createContactRequest();
+
+        runAsAdmin();
 
         //when
         var contactRequestResponse = client.postForEntity(

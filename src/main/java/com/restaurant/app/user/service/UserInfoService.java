@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import static com.restaurant.app.response.StateValues.USER_NOT_EXISTS;
+import static com.restaurant.app.response.ConstantValues.USER_NOT_EXISTS;
 
 public class UserInfoService implements UserDetailsService {
 

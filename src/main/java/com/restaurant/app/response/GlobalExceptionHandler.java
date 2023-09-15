@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static com.restaurant.app.response.StateValues.INCORRECT_LOG_DATA;
-import static com.restaurant.app.response.StateValues.NO_ACCESS;
+import static com.restaurant.app.response.ConstantValues.INCORRECT_LOG_DATA;
+import static com.restaurant.app.response.ConstantValues.NO_ACCESS;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -20,14 +19,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
+    public ResponseEntity<Void> handleAccessDeniedException(AccessDeniedException ex) {
         LOGGER.warn(NO_ACCESS);
-        return ResponseHandler.generateError(NO_ACCESS, FORBIDDEN);
+        return ResponseEntity.status(FORBIDDEN).build();
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+    public ResponseEntity<Void> handleAuthenticationException(AuthenticationException ex) {
         LOGGER.warn(INCORRECT_LOG_DATA);
-        return ResponseHandler.generateError(INCORRECT_LOG_DATA, NOT_FOUND);
+        return ResponseEntity.notFound().build();
     }
 }

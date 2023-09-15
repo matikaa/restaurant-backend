@@ -19,6 +19,8 @@ class ContactControllerTest extends TestUseCase {
         //given
         var contactRequest = createContactRequest();
 
+        runAsAdmin();
+
         //when
         var contactResponse = client.postForEntity(
                 prepareUrl(CONTACT_RESOURCE),
@@ -44,6 +46,8 @@ class ContactControllerTest extends TestUseCase {
     void shouldNotAddContactAndReturnBadRequest() {
         //given
         var contactRequest = createContactRequest();
+
+        runAsAdmin();
 
         //when
         var contactResponse = client.postForEntity(

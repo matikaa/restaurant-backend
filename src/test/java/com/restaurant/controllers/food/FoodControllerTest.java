@@ -96,6 +96,8 @@ class FoodControllerTest extends TestUseCase {
         var foodPrice = 34;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
+        runAsAdmin();
+
         //when
         var foodResponse = client.postForEntity(
                 prepareFoodUrlWithCategoryId(WRONG_ID),

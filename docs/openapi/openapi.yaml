@@ -26,7 +26,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  CategoryListResponse:
+                  Categories:
                     type: array
                     items:
                       $ref: '#/components/schemas/CategoryResponse'
@@ -103,6 +103,8 @@ paths:
       responses:
         '200':
           description: Category was deleted successfully
+        '403':
+          description: User does not have permissions to access that resource
         '404':
           description: Category was not found
     put:
@@ -135,6 +137,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoryResponse'
+        '403':
+          description: User does not have permissions to access that resource
         '404':
           description: Category was not found
 
@@ -162,12 +166,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  food:
+                  Food:
                     type: array
                     items:
                       $ref: '#/components/schemas/FoodResponse'
-        '404':
-          description: Food was not found
     post:
       tags:
         - food
@@ -203,7 +205,9 @@ paths:
                 example: "application/json"
               description: One of multiple possible Content-Type headers
         '400':
-          description: Food is invalid
+          description: Food with this position already exists
+        '403':
+          description: User does not have permissions to access that resource
         '404':
           description: Category or food was not found
 
@@ -274,7 +278,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/FoodResponse'
         '400':
-          description: Food is invalid
+          description: Food with this position already exists
+        '403':
+          description: User does not have permissions to access that resource
         '404':
           description: Food was not found
     delete:
@@ -322,12 +328,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  users:
+                  Users:
                     type: array
                     items:
-                      $ref: '#/components/schemas/UserListResponse'
+                      $ref: '#/components/schemas/UserResponse'
         '403':
-          description: User has no permission to access that resource
+          description: User does not have permissions to access that resource
     post:
       tags:
         - users
@@ -350,7 +356,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserRequestResponse'
-        '403':
+        '400':
           description: Wrong email
         '409':
           description: User already exists
@@ -380,7 +386,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '403':
-          description: User has no permission to access that resource
+          description: User does not have permissions to access that resource
         '404':
           description: User not exists
 
@@ -426,7 +432,7 @@ paths:
         '200':
           description: User was fetched successfully
         '403':
-          description: User has no permission to access that resource
+          description: User does not have permissions to access that resource
 
   /users/password:
     put:
@@ -451,7 +457,7 @@ paths:
         '200':
           description: Password changed
         '403':
-          description: User has no permission to access that resource
+          description: User does not have permissions to access that resource
         '409':
           description: Wrong password or new is the same as old
 
@@ -463,6 +469,7 @@ paths:
       description: |
         Add contact of company
 
+        Allowed roles: ```ADMIN```
       operationId: addContact
       requestBody:
         description: add contact of company
@@ -470,21 +477,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ContactRequestBody'
+              $ref: '#/components/schemas/ContactRequest'
       responses:
         '201':
           description: Contact created
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  contact:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ContactResponse'
+                $ref: '#/components/schemas/ContactRequestResponse'
         '400':
           description: Contact already exists
+        '403':
+          description: User does not have permissions to access that resource
 
   /contact/{contactId}:
     get:
@@ -516,7 +520,10 @@ paths:
       tags:
         - contact
       summary: Delete contact
-      description: Delete contact
+      description: |
+        Delete contact
+        
+        Allowed roles: ```ADMIN```
       operationId: deleteContact
       parameters:
         - in: path
@@ -529,20 +536,25 @@ paths:
       responses:
         '200':
           description: Contact was deleted successfully
+        '403':
+          description: User does not have permissions to access that resource
         '404':
           description: Contact was not found
     put:
       tags:
         - contact
       summary: Update contact
-      description: Update contact
+      description: |
+        Update contact
+        
+        Allowed roles: ```ADMIN```
       operationId: updateContact
       requestBody:
         description: Update contact
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ContactRequestBody'
+              $ref: '#/components/schemas/ContactRequest'
         required: true
       parameters:
         - in: path
@@ -558,6 +570,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContactResponse'
+        '403':
+          description: User does not have permissions to access that resource
         '404':
           description: Contact was not found
 
@@ -568,22 +582,6 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    Category:
-      required:
-        - name
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 3
-        positionId:
-          type: integer
-          format: int64
-          example: 1
-        name:
-          type: string
-          example: 'Main dishes'
 
     CategoryRequest:
       type: object
@@ -668,37 +666,38 @@ components:
           type: number
           example: 43
 
-    UserListResponse:
+    ContactRequestResponse:
       type: object
       properties:
-        userId:
+        contactId:
           type: integer
           example: 1
-        email:
+        contactMail:
           type: string
-          example: 'acso@temp.pl'
-        name:
+          example: 'company@temp.pl'
+        contactPhoneNumber:
           type: string
-          example: 'Krystian'
-        createdTime:
+          example: '509283543'
+        openingHoursDays:
           type: string
-          format: data-time
-          example: '2023-05-26T10:20:30'
-        role:
+          example: 'pon-sb'
+        openingHoursOpenTime:
           type: string
-          example: 'User'
-        address:
+          format: time
+          example: '9.00'
+        openingHoursCloseTime:
           type: string
-          example: 'ul. Kosciuszki 20, 90-001 Lodz'
-        phoneNumber:
+          format: time
+          example: '22.00'
+        addressCity:
           type: string
-          example: '502578994'
-        money:
-          type: integer
-          example: 132
-        loyaltyCard:
-          type: boolean
-          example: true
+          example: "Warszawa"
+        addressStreet:
+          type: string
+          example: "Zlota"
+        addressNumber:
+          type: number
+          example: 43
 
     UserRequest:
       type: object
@@ -810,24 +809,6 @@ components:
           type: string
           example: 'PL039fad!#5gG'
 
-    FoodListResponse:
-      type: object
-      properties:
-        categoryId:
-          type: integer
-          format: int64
-          example: 3
-        positionId:
-          type: integer
-          format: int64
-          example: 4
-        foodName:
-          type: string
-          example: 'French fries'
-        foodPrice:
-          type: integer
-          example: 12
-
     FoodResponse:
       type: object
       properties:
@@ -904,7 +885,7 @@ components:
           type: integer
           example: 12
 
-    ContactRequestBody:
+    ContactRequest:
       type: object
       properties:
         contactMail:

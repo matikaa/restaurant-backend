@@ -17,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.restaurant.app.response.StateValues.*;
+import static com.restaurant.app.response.ConstantValues.*;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 public class JwtFilter extends OncePerRequestFilter {
