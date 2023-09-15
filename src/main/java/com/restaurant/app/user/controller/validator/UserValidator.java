@@ -10,7 +10,9 @@ public class UserValidator {
         return !(userRequest instanceof UserRequest) || userRequest.name() == null ||
                 userRequest.name().trim().isEmpty() || userRequest.email() == null ||
                 userRequest.email().trim().isEmpty() || userRequest.password() == null ||
-                userRequest.password().trim().isEmpty();
+                userRequest.password().trim().isEmpty() || userRequest.address() == null ||
+                userRequest.address().trim().isEmpty() || userRequest.phoneNumber() == null ||
+                userRequest.phoneNumber().trim().isEmpty();
     }
 
     public boolean isLoginRequestNotValid(LoginRequest loginRequest) {

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.restaurant.app.response.StateValues.TIME;
+import static com.restaurant.app.response.ConstantValues.TIME;
 
 public class BaseJwtService implements JwtService {
 

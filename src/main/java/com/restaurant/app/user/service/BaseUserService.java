@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.restaurant.app.response.StateValues.TOKEN_PREFIX_LENGTH;
+import static com.restaurant.app.response.ConstantValues.TOKEN_PREFIX_LENGTH;
 
 public class BaseUserService implements UserService {
 

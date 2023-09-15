@@ -5,7 +5,7 @@ import com.restaurant.app.user.repository.dto.UserModel;
 import java.util.List;
 import java.util.Optional;
 
-import static com.restaurant.app.response.StateValues.EMPTY_STRING;
+import static com.restaurant.app.response.ConstantValues.EMPTY_STRING;
 
 public class JpaWrappedUserRepository implements UserRepository {
 

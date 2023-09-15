@@ -1,9 +1,6 @@
 package com.restaurant.app.user.controller;
 
-import com.restaurant.app.response.ResponseHandler;
-import com.restaurant.app.user.controller.dto.ChangePasswordRequest;
-import com.restaurant.app.user.controller.dto.UserListResponse;
-import com.restaurant.app.user.controller.dto.UserRequest;
+import com.restaurant.app.user.controller.dto.*;
 import com.restaurant.app.user.controller.validator.UserValidator;
 import com.restaurant.app.user.service.UserService;
 import jakarta.transaction.Transactional;
@@ -15,8 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import static com.restaurant.app.response.StateValues.*;
-import static org.springframework.http.HttpStatus.*;
+import static com.restaurant.app.response.ConstantValues.*;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/users")
@@ -24,9 +22,9 @@ public class UserController {
 
     private static final UserControllerMapper userControllerMapper = UserControllerMapper.INSTANCE;
 
-    private final UserService userService;
-
     private final UserValidator userValidator;
+
+    private final UserService userService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
@@ -37,7 +35,7 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getUsers() {
+    public ResponseEntity<UserListResponse> getUsers() {
         return ResponseEntity.ok().body(new UserListResponse(
                 userControllerMapper.usersToUserResponses(
                         userService.getAll()).stream().toList()));
@@ -45,10 +43,10 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getUser(@PathVariable Long userId) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long userId) {
         if (!userService.existsByUserId(userId)) {
             LOGGER.warn(USER_NOT_EXISTS);
-            return ResponseHandler.generateError(USER_NOT_EXISTS, NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
 
         return userService.getUserById(userId)
@@ -58,20 +56,20 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addUser(@RequestBody UserRequest userRequest) {
+    public ResponseEntity<UserRequestResponse> addUser(@RequestBody UserRequest userRequest) {
         if (userValidator.isUserRequestNotValid(userRequest)) {
             LOGGER.warn(INVALID_REQUEST_BODY);
-            return ResponseHandler.generateError(INVALID_REQUEST_BODY, BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
 
         if (!userService.isValidEmail(userRequest.email())) {
             LOGGER.warn(WRONG_EMAIL);
-            return ResponseHandler.generateError(WRONG_EMAIL, BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
 
         if (userService.existsUserByEmail(userRequest.email())) {
-            LOGGER.warn(EXISTING_EMAIL);
-            return ResponseHandler.generateError(EXISTING_EMAIL, CONFLICT);
+            LOGGER.warn(EMAIL_EXISTS);
+            return ResponseEntity.status(CONFLICT).build();
         }
 
         return ResponseEntity.status(CREATED).body(
@@ -79,10 +77,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginRequestResponse> login(@RequestBody LoginRequest loginRequest) {
         if (userValidator.isLoginRequestNotValid(loginRequest)) {
             LOGGER.warn(INVALID_REQUEST_BODY);
-            return ResponseHandler.generateError(INVALID_REQUEST_BODY, BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
 
         if (userService.verifyAndLogUser(loginRequest)) {
@@ -91,17 +89,17 @@ public class UserController {
                             userService.generateToken(loginRequest.email())));
         } else {
             LOGGER.warn(INCORRECT_LOG_DATA);
-            return ResponseHandler.generateError(INCORRECT_LOG_DATA, NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/logout")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     @Transactional
-    public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+    public ResponseEntity<Void> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         if (userValidator.isStringNotValid(authorizationHeader)) {
             LOGGER.warn(INVALID_REQUEST_BODY);
-            return ResponseHandler.generateError(INVALID_REQUEST_BODY, BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
 
         userService.logout(authorizationHeader);
@@ -111,10 +109,10 @@ public class UserController {
 
     @PutMapping("/password")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         if (userValidator.isChangePasswordRequestNotValid(changePasswordRequest)) {
             LOGGER.warn(INVALID_REQUEST_BODY);
-            return ResponseHandler.generateError(INVALID_REQUEST_BODY, BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
         var userMail = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -123,7 +121,7 @@ public class UserController {
 
         if (!changedPassword) {
             LOGGER.warn(INCORRECT_PASSWORD);
-            return ResponseHandler.generateError(INCORRECT_PASSWORD, CONFLICT);
+            return ResponseEntity.status(CONFLICT).build();
         }
 
         return ResponseEntity.ok().build();

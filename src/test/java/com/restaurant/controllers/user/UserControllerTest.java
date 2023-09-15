@@ -123,7 +123,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "533045678";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        var createdUser = createUser(createUserRequest);
+        var createdUser = saveUser(createUserRequest);
 
         //when
         runAsAdmin();
@@ -159,7 +159,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "534156789";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        var createdUser = createUser(createUserRequest);
+        var createdUser = saveUser(createUserRequest);
 
         //when
         runAsAdmin();
@@ -189,7 +189,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "535267890";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        createUser(createUserRequest);
+        saveUser(createUserRequest);
 
         //when
         runAsAdmin();
@@ -213,7 +213,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "536378901";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        createUser(createUserRequest);
+        saveUser(createUserRequest);
 
         var loginRequest = new LoginRequest(email, password);
 
@@ -241,7 +241,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "539601234";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        createUser(createUserRequest);
+        saveUser(createUserRequest);
 
         var loginRequest = new LoginRequest(wrongEmail, password);
 
@@ -268,7 +268,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "530712345";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        createUser(createUserRequest);
+        saveUser(createUserRequest);
 
         var loginRequest = new LoginRequest(email, wrongPassword);
 
@@ -341,7 +341,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "531823456";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        createUser(createUserRequest);
+        saveUser(createUserRequest);
 
         var changedPasswordRequest = new ChangePasswordRequest(password, newPassword);
 
@@ -385,7 +385,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "533045678";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        createUser(createUserRequest);
+        saveUser(createUserRequest);
 
         var changedPasswordRequest = new ChangePasswordRequest(wrongPassword, newPassword);
 
@@ -414,7 +414,7 @@ class UserControllerTest extends TestUseCase {
         var phoneNumber = "534156789";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
-        createUser(createUserRequest);
+        saveUser(createUserRequest);
 
         var changedPasswordRequest = new ChangePasswordRequest(password, password);
 
