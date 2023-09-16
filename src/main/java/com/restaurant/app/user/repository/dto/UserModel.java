@@ -1,5 +1,7 @@
 package com.restaurant.app.user.repository.dto;
 
+import com.restaurant.app.user.controller.dto.UpdateUserRequest;
+
 import java.time.LocalDateTime;
 
 public record UserModel(
@@ -15,7 +17,7 @@ public record UserModel(
         Boolean loyaltyCard
 ) {
 
-    public UserModel modifiedUser(String encodedPassword) {
+    public UserModel newUser(String encodedPassword) {
         return new UserModel(
                 userId,
                 email,
@@ -40,6 +42,21 @@ public record UserModel(
                 this.role,
                 address,
                 phoneNumber,
+                money,
+                loyaltyCard
+        );
+    }
+
+    public UserModel modifiedUser(UpdateUserRequest updateUserRequest) {
+        return new UserModel(
+                userId,
+                email,
+                updateUserRequest.name(),
+                password,
+                createdTime,
+                role,
+                updateUserRequest.address(),
+                updateUserRequest.phoneNumber(),
                 money,
                 loyaltyCard
         );
