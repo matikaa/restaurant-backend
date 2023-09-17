@@ -1,6 +1,5 @@
 package com.restaurant.app.food.controller;
 
-import com.restaurant.app.food.controller.dto.FoodRequest;
 import com.restaurant.app.food.controller.dto.FoodRequestResponse;
 import com.restaurant.app.food.controller.dto.FoodRequestUpdate;
 import com.restaurant.app.food.controller.dto.FoodResponse;
@@ -20,8 +19,6 @@ public interface FoodControllerMapper {
     FoodRequestResponse foodToFoodRequestResponse(Food food);
 
     List<FoodResponse> foodsToFoodResponses(List<Food> foods);
-
-    Food foodRequestToFood(Long categoryId, Long foodId, FoodRequest foodRequest);
 
     Food foodRequestUpdateToFood(Long foodId, FoodRequestUpdate foodRequestUpdate);
 }

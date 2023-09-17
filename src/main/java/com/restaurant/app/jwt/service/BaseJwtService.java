@@ -1,7 +1,7 @@
 package com.restaurant.app.jwt.service;
 
-import com.restaurant.app.jwt.repository.dto.JwtModel;
 import com.restaurant.app.jwt.repository.JwtRepository;
+import com.restaurant.app.jwt.repository.dto.JwtModel;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.restaurant.app.response.ConstantValues.TIME;
+import static com.restaurant.app.common.ConstantValues.TIME;
 
 public class BaseJwtService implements JwtService {
 

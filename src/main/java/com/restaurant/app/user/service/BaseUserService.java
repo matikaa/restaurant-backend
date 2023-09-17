@@ -1,11 +1,7 @@
 package com.restaurant.app.user.service;
 
 import com.restaurant.app.jwt.service.JwtService;
-import com.restaurant.app.user.controller.LoginRequest;
-import com.restaurant.app.user.controller.dto.ChangePasswordRequest;
-import com.restaurant.app.user.controller.dto.UpdateUserRequest;
-import com.restaurant.app.user.controller.dto.UserChangePasswordRequest;
-import com.restaurant.app.user.controller.dto.UserRequest;
+import com.restaurant.app.user.controller.dto.*;
 import com.restaurant.app.user.repository.UserRepository;
 import com.restaurant.app.user.service.dto.User;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +14,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.restaurant.app.response.ConstantValues.TOKEN_PREFIX_LENGTH;
+import static com.restaurant.app.common.ConstantValues.TOKEN_PREFIX_LENGTH;
 
 public class BaseUserService implements UserService {
 
@@ -50,6 +46,12 @@ public class BaseUserService implements UserService {
     @Override
     public Optional<User> getUserById(Long userId) {
         return userRepository.findById(userId)
+                .map(userServiceMapper::userModelToUser);
+    }
+
+    @Override
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
                 .map(userServiceMapper::userModelToUser);
     }
 
@@ -145,7 +147,7 @@ public class BaseUserService implements UserService {
     private boolean validPasswords(String email, ChangePasswordRequest changePasswordRequest) {
         var password = userRepository.getCurrentPassword(email);
 
-        if (!password.isEmpty() && verifyPassword(email, changePasswordRequest.currentPassword()) &&
+        if (verifyPassword(email, changePasswordRequest.currentPassword()) &&
                 !passwordEncoder.matches(changePasswordRequest.newPassword(), password)) {
             return true;
         }
@@ -156,6 +158,16 @@ public class BaseUserService implements UserService {
     @Override
     public boolean existsByUserId(Long userId) {
         return userRepository.existsByUserId(userId);
+    }
+
+    @Override
+    public void completeOrder(Long userId, Double cartValue) {
+            userRepository.payForOrder(userId, cartValue);
+    }
+
+    @Override
+    public void updateUserBalance(Long userId, UserMoney userMoney) {
+        userRepository.updateAccountBalance(userId, userMoney.money());
     }
 
     @Override

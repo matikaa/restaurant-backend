@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static com.restaurant.app.response.ConstantValues.*;
+import static com.restaurant.app.common.ConstantValues.*;
 import static org.springframework.http.HttpStatus.CREATED;
 
 

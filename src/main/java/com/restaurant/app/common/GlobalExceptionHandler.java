@@ -1,4 +1,4 @@
-package com.restaurant.app.response;
+package com.restaurant.app.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static com.restaurant.app.response.ConstantValues.INCORRECT_LOG_DATA;
-import static com.restaurant.app.response.ConstantValues.NO_ACCESS;
+import static com.restaurant.app.common.ConstantValues.INCORRECT_LOG_DATA;
+import static com.restaurant.app.common.ConstantValues.NO_ACCESS;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @ControllerAdvice

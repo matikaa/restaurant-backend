@@ -1,6 +1,7 @@
 package com.restaurant.controllers;
 
 import com.restaurant.app.App;
+import com.restaurant.app.cart.controller.dto.CartResponse;
 import com.restaurant.app.category.controller.dto.CategoryRequest;
 import com.restaurant.app.category.controller.dto.CategoryRequestResponse;
 import com.restaurant.app.category.controller.dto.UpdateCategoryRequest;
@@ -9,7 +10,7 @@ import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
 import com.restaurant.app.food.controller.dto.FoodRequest;
 import com.restaurant.app.food.controller.dto.FoodRequestResponse;
 import com.restaurant.app.food.controller.dto.FoodRequestUpdate;
-import com.restaurant.app.user.controller.LoginRequest;
+import com.restaurant.app.user.controller.dto.LoginRequest;
 import com.restaurant.app.user.controller.dto.LoginRequestResponse;
 import com.restaurant.app.user.controller.dto.UserRequest;
 import com.restaurant.app.user.controller.dto.UserRequestResponse;
@@ -24,9 +25,10 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.Collections;
 
-import static com.restaurant.app.response.ConstantValues.TOKEN_PREFIX;
+import static com.restaurant.app.common.ConstantValues.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -47,6 +49,8 @@ public class TestUseCase {
 
     private static final String USER_EMAIL = "mariuszek@user.pl";
     private static final String USER_PASSWORD = "user";
+    protected static final Double USER_BALANCE = 20D;
+    protected static final Long USER_ID = 2L;
     private static final String ADMIN_EMAIL = "pro8l@admin.pl";
     private static final String ADMIN_PASSWORD = "admin";
 
@@ -72,6 +76,13 @@ public class TestUseCase {
     protected static final String PASSWORD_PATH = PROFILE_USER_PATH + "/password";
     protected static final String ADMIN_PASSWORD_PATH = "/password";
     protected static final String DELETE_USER_PATH = "/delete";
+    protected static final String BALANCE_USER_PATH = "/balance";
+    protected static final String USER_REQUEST_PASSWORD = "fdaf$!f!FF";
+
+    protected static final String ORDER_PATH = "/order";
+    protected static final String FOOD_NAME = "French fries";
+    protected static final String CART_PATH = "/cart/order";
+
 
     protected CategoryRequestResponse saveCategory(String categoryName, Long positionId) {
         //given
@@ -92,11 +103,11 @@ public class TestUseCase {
         return createCategoryResponse.getBody();
     }
 
-    protected FoodRequestUpdate createFoodRequestUpdate(Long categoryId, long positionId, String foodName, int foodPrice) {
+    protected FoodRequestUpdate createFoodRequestUpdate(Long categoryId, Long positionId, String foodName, Double foodPrice) {
         return new FoodRequestUpdate(categoryId, positionId, foodName, foodPrice);
     }
 
-    protected FoodRequestResponse saveFood(Long categoryId, String foodName, Integer foodPrice, Long foodPositionId) {
+    protected FoodRequestResponse saveFood(Long categoryId, String foodName, Double foodPrice, Long foodPositionId) {
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         runAsAdmin();
@@ -112,6 +123,30 @@ public class TestUseCase {
         assertThat(foodResponse.getStatusCode(), is(equalTo(CREATED)));
         assertThat(foodResponse.getBody(), is(notNullValue()));
         return foodResponse.getBody();
+    }
+
+    protected FoodRequestResponse saveCategoryAndFood(Double foodPrice) {
+        //given
+        var categoryName = "main";
+        var positionId = 1L;
+        var createdCategory = saveCategory(categoryName, positionId);
+
+        //then
+        return saveFood(createdCategory.categoryId(), FOOD_NAME, foodPrice, positionId);
+    }
+
+    protected void saveOrder(Long categoryId, Long foodId) {
+        //when
+        var orderResponse = client.exchange(
+                prepareOrderUrlWithFoodIdAndCategoryId(categoryId, foodId),
+                PUT,
+                null,
+                CartResponse.class
+        );
+
+        //then
+        assertThat(orderResponse.getStatusCode(), is(equalTo(OK)));
+        assertThat(orderResponse.getBody(), is(notNullValue()));
     }
 
     protected UpdateCategoryRequest getUpdatedCategoryRequest(Long positionId, String categoryName) {
@@ -213,6 +248,22 @@ public class TestUseCase {
         return prepareUrl(String.format(CONTACT_PATH, contactId));
     }
 
+    protected String prepareUserBalanceUrlWithUserId(Long userId) {
+        return prepareUrl(String.format(USER_PATH, userId) + BALANCE_USER_PATH);
+    }
+
+    protected String prepareOrderUrlWithFoodIdAndCategoryId(Long categoryId, Long foodId) {
+        return prepareFoodUrlWithFoodIdAndCategoryId(categoryId, foodId) + ORDER_PATH;
+    }
+
+    protected String prepareCartUrlWithUserId(Long userId) {
+        return prepareUserUrlWithUserId(userId) + CART_PATH;
+    }
+
+    protected String prepareOrderUrlWithUserId(Long userId) {
+        return prepareUserUrlWithUserId(userId) + ORDER_PATH;
+    }
+
     protected ContactRequest createContactRequest() {
         return new ContactRequest(
                 "company@temp.pl",
@@ -257,8 +308,16 @@ public class TestUseCase {
         );
     }
 
-    protected FoodRequest createFoodRequest(Long foodPosition, String foodName, Integer foodPrice) {
+    protected Double valueWithDelivery(Double price) {
+        return price + DELIVERY_PRICE;
+    }
+
+    protected FoodRequest createFoodRequest(Long foodPosition, String foodName, Double foodPrice) {
         return new FoodRequest(foodPosition, foodName, foodPrice);
+    }
+
+    protected Double valueWithDiscount(Double price) {
+        return price - (price * DISCOUNT) + DELIVERY_PRICE;
     }
 
     protected <T> HttpEntity<Object> createBody(T body) {

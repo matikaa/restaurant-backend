@@ -392,8 +392,6 @@ paths:
           description: Password changed
         '403':
           description: User does not have permissions to access that resource
-        '404':
-          description: User not exists
 
   /users/{userId}/delete:
     post:
@@ -577,6 +575,40 @@ paths:
         '403':
           description: User does not have permissions to access that resource
 
+  /users/{userId}/balance:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - users
+      summary: Change user balance
+      description: |
+        **Change user balance**
+
+        Allowed roles: ```ADMIN```
+      operationId: changeAnyUserAccountBalance
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      requestBody:
+        description: Change balance.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserMoney'
+        required: true
+      responses:
+        '200':
+          description: User was updated successfully
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: User not exists
+
   /contact:
     post:
       tags:
@@ -691,6 +723,212 @@ paths:
         '404':
           description: Contact was not found
 
+  /categories/{categoryId}/food/{foodId}/order:
+    put:
+      tags:
+        - cart
+      summary: Add to order
+      description: |
+        Add food to order
+        
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: addToOrder
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+        - in: path
+          name: foodId
+          schema:
+            type: integer
+          required: true
+          description: ID of the food
+      responses:
+        '200':
+          description: Food was added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '402':
+          description: Not enough money to buy
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: Food with category was not found
+        '409':
+          description: Order is in delivery
+
+    post:
+      tags:
+        - cart
+      summary: Delete food from order
+      description: |
+        Delete food from order
+
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: deleteFromOrder
+      parameters:
+        - in: path
+          name: categoryId
+          schema:
+            type: integer
+          required: true
+          description: ID of the category
+        - in: path
+          name: foodId
+          schema:
+            type: integer
+          required: true
+          description: ID of the food
+      responses:
+        '200':
+          description: Food successfully deleted from order
+        '400':
+          description: Food does not exists in order
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: Food with category was not found
+        '409':
+          description: Cart is empty
+
+  /users/{userId}/cart/order:
+    put:
+      tags:
+        - cart
+      summary: Confirm order
+      description: |
+        Confirm order to delivery
+        
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: confirmOrder
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: Order was confirmed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: Cart is empty
+
+    post:
+      tags:
+        - cart
+      summary: Confirm delivery
+      description: |
+        Confirm delivery of order
+
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: confirmDelivery
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: Order successfully delivered
+        '403':
+          description: User does not have permissions to access that resource
+        '409':
+          description: There is not delivery to confirm
+
+    get:
+      tags:
+        - cart
+      summary: Get current order
+      description: |
+        Get current user's order
+
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: getCurrentUserOrder
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: Order was successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '403':
+          description: User does not have permissions to access that resource
+        '409':
+          description: Cart is empty
+
+    delete:
+      tags:
+        - cart
+      summary: Cancel order
+      description: |
+        Cancel current user's order
+
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: cancelOrder
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: Order was successfully deleted
+        '403':
+          description: User does not have permissions to access that resource
+        '409':
+          description: There is not order to delete
+
+  /users/{userId}/order:
+    get:
+      tags:
+        - cart
+      summary: Get all orders
+      description: |
+        Get all user's orders
+
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: getAllUserOrders
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: Orders were successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartDeliveredResponse'
+        '403':
+          description: User does not have permissions to access that resource
+
+
 components:
   securitySchemes:
     bearerAuth:
@@ -751,6 +989,33 @@ components:
           type: string
           example: "Main dishes"
 
+    CartDeliveredResponse:
+      type: object
+      properties:
+        overallCartValue:
+          type: number
+          example: 150
+        cartResponses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartResponse'
+
+    CartResponse:
+      type: object
+      properties:
+        cartValue:
+          type: number
+          example: 50
+        food:
+          type: array
+          items:
+            type: string
+            example: steak
+        foodPrice:
+          type: array
+          items:
+            type: number
+            example: 54
 
     ContactResponse:
       type: object
@@ -951,6 +1216,14 @@ components:
         phoneNumber:
           type: string
           example: '532805003'
+
+    UserMoney:
+      type: object
+      properties:
+        money:
+          type: integer
+          format: int64
+          example: 3
 
     FoodResponse:
       type: object

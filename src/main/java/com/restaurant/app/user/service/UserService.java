@@ -1,10 +1,6 @@
 package com.restaurant.app.user.service;
 
-import com.restaurant.app.user.controller.LoginRequest;
-import com.restaurant.app.user.controller.dto.ChangePasswordRequest;
-import com.restaurant.app.user.controller.dto.UpdateUserRequest;
-import com.restaurant.app.user.controller.dto.UserChangePasswordRequest;
-import com.restaurant.app.user.controller.dto.UserRequest;
+import com.restaurant.app.user.controller.dto.*;
 import com.restaurant.app.user.service.dto.User;
 
 import java.util.List;
@@ -13,6 +9,8 @@ import java.util.Optional;
 public interface UserService {
 
     Optional<User> getUserById(Long userId);
+
+    Optional<User> getUserByEmail(String email);
 
     List<User> getAll();
 
@@ -41,4 +39,8 @@ public interface UserService {
     boolean changePassword(String email, ChangePasswordRequest changePasswordRequest);
 
     boolean isValidEmail(String email);
+
+    void completeOrder(Long userId, Double cartValue);
+
+    void updateUserBalance(Long userId, UserMoney userMoney);
 }
