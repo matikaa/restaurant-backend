@@ -1,9 +1,9 @@
 package configuration;
 
-import com.restaurant.app.jwt.filter.JwtFilter;
-import com.restaurant.app.jwt.service.JwtService;
-import com.restaurant.app.user.repository.UserJpaRepository;
-import com.restaurant.app.user.service.UserInfoService;
+import com.restaurant.jwt.filter.JwtFilter;
+import com.restaurant.jwt.service.JwtService;
+import com.restaurant.user.repository.UserJpaRepository;
+import com.restaurant.user.service.UserInfoService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

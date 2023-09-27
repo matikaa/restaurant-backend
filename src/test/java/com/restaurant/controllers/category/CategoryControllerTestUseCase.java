@@ -1,9 +1,9 @@
 package com.restaurant.controllers.category;
 
-import com.restaurant.app.category.controller.dto.CategoryListResponse;
-import com.restaurant.app.category.controller.dto.CategoryRequest;
-import com.restaurant.app.category.controller.dto.CategoryRequestResponse;
-import com.restaurant.app.category.controller.dto.CategoryResponse;
+import com.restaurant.category.controller.dto.CategoryListResponse;
+import com.restaurant.category.controller.dto.CategoryRequest;
+import com.restaurant.category.controller.dto.CategoryRequestResponse;
+import com.restaurant.category.controller.dto.CategoryResponse;
 import com.restaurant.controllers.TestUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

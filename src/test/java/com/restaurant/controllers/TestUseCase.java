@@ -1,19 +1,19 @@
 package com.restaurant.controllers;
 
-import com.restaurant.app.App;
-import com.restaurant.app.cart.controller.dto.CartResponse;
-import com.restaurant.app.category.controller.dto.CategoryRequest;
-import com.restaurant.app.category.controller.dto.CategoryRequestResponse;
-import com.restaurant.app.category.controller.dto.UpdateCategoryRequest;
-import com.restaurant.app.contact.controller.dto.ContactRequest;
-import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
-import com.restaurant.app.food.controller.dto.FoodRequest;
-import com.restaurant.app.food.controller.dto.FoodRequestResponse;
-import com.restaurant.app.food.controller.dto.FoodRequestUpdate;
-import com.restaurant.app.user.controller.dto.LoginRequest;
-import com.restaurant.app.user.controller.dto.LoginRequestResponse;
-import com.restaurant.app.user.controller.dto.UserRequest;
-import com.restaurant.app.user.controller.dto.UserRequestResponse;
+import com.restaurant.App;
+import com.restaurant.cart.controller.dto.CartResponse;
+import com.restaurant.category.controller.dto.CategoryRequest;
+import com.restaurant.category.controller.dto.CategoryRequestResponse;
+import com.restaurant.category.controller.dto.UpdateCategoryRequest;
+import com.restaurant.contact.controller.dto.ContactRequest;
+import com.restaurant.contact.controller.dto.ContactRequestResponse;
+import com.restaurant.food.controller.dto.FoodRequest;
+import com.restaurant.food.controller.dto.FoodRequestResponse;
+import com.restaurant.food.controller.dto.FoodRequestUpdate;
+import com.restaurant.user.controller.dto.LoginRequest;
+import com.restaurant.user.controller.dto.LoginRequestResponse;
+import com.restaurant.user.controller.dto.UserRequest;
+import com.restaurant.user.controller.dto.UserRequestResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.Collections;
 
-import static com.restaurant.app.common.ConstantValues.*;
+import static com.restaurant.common.ConstantValues.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpMethod.PUT;

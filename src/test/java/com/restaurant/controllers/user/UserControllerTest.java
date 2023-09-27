@@ -1,7 +1,7 @@
 package com.restaurant.controllers.user;
 
-import com.restaurant.app.user.controller.dto.*;
 import com.restaurant.controllers.TestUseCase;
+import com.restaurant.user.controller.dto.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

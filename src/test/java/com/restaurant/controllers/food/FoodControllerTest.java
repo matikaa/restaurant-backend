@@ -1,8 +1,8 @@
 package com.restaurant.controllers.food;
 
-import com.restaurant.app.food.controller.dto.FoodListResponse;
-import com.restaurant.app.food.controller.dto.FoodRequestResponse;
-import com.restaurant.app.food.controller.dto.FoodResponse;
+import com.restaurant.food.controller.dto.FoodListResponse;
+import com.restaurant.food.controller.dto.FoodRequestResponse;
+import com.restaurant.food.controller.dto.FoodResponse;
 import com.restaurant.controllers.TestUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
