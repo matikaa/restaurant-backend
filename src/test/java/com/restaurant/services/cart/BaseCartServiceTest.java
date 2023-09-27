@@ -268,5 +268,4 @@ class BaseCartServiceTest extends BaseTestUseCase {
         //then
         assertEquals(value, resultOfOverallCartValue);
     }
-
 }
