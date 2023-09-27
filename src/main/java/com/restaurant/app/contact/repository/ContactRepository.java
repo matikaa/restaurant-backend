@@ -4,7 +4,7 @@ import com.restaurant.app.contact.repository.dto.ContactModel;
 
 import java.util.Optional;
 
-public interface ContactRepository{
+public interface ContactRepository {
 
     Optional<ContactModel> findContactByContactId(Long contactId);
 

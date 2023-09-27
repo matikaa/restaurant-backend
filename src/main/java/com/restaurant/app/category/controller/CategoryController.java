@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static com.restaurant.app.response.ConstantValues.*;
+import static com.restaurant.app.common.ConstantValues.*;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController

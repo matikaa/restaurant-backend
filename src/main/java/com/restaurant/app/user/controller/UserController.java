@@ -12,9 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import static com.restaurant.app.response.ConstantValues.*;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.CREATED;
+import static com.restaurant.app.common.ConstantValues.*;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/users")
@@ -118,9 +117,9 @@ public class UserController {
         var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         var changedUser = userService.changeUserDetails(userEmail, updateUserRequest);
-        if (!changedUser.isPresent()) {
-            LOGGER.warn(USER_NOT_EXISTS);
-            return ResponseEntity.notFound().build();
+        if (changedUser.isEmpty()) {
+            LOGGER.warn(NO_ACCESS);
+            return ResponseEntity.status(FORBIDDEN).build();
         }
 
         return ResponseEntity.ok().body(userControllerMapper.userToUserResponse(changedUser.get()));
@@ -136,14 +135,14 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
         var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!userService.existsUserByEmail(userEmail)) {
+            LOGGER.warn(NO_ACCESS);
+            return ResponseEntity.status(FORBIDDEN).build();
+        }
+
         if (!userService.verifyPassword(userEmail, passwordRequest.password())) {
             LOGGER.warn(INCORRECT_PASSWORD);
             return ResponseEntity.badRequest().build();
-        }
-
-        if (!userService.existsUserByEmail(userEmail)) {
-            LOGGER.warn(USER_NOT_EXISTS);
-            ResponseEntity.notFound().build();
         }
 
         userService.logout(authorizationHeader);
@@ -175,6 +174,11 @@ public class UserController {
         }
         var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        if (!userService.existsUserByEmail(userEmail)) {
+            LOGGER.warn(NO_ACCESS);
+            return ResponseEntity.status(FORBIDDEN).build();
+        }
+
         var changedPassword = userService.changePassword(
                 userEmail, changePasswordRequest);
 
@@ -199,6 +203,20 @@ public class UserController {
             LOGGER.warn(USER_NOT_EXISTS);
             return ResponseEntity.notFound().build();
         }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{userId}/balance")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> changeAnyUserAccountBalance(@PathVariable Long userId,
+                                                            @RequestBody UserMoney userMoney) {
+        if (!userService.existsByUserId(userId)) {
+            LOGGER.warn(USER_NOT_EXISTS);
+            return ResponseEntity.notFound().build();
+        }
+
+        userService.updateUserBalance(userId, userMoney);
 
         return ResponseEntity.ok().build();
     }

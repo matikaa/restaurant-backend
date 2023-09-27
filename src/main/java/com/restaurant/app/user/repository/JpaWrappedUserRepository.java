@@ -6,7 +6,8 @@ import com.restaurant.app.user.repository.dto.UserModel;
 import java.util.List;
 import java.util.Optional;
 
-import static com.restaurant.app.response.ConstantValues.EMPTY_STRING;
+import static com.restaurant.app.common.ConstantValues.EMPTY_STRING;
+import static com.restaurant.app.common.ConstantValues.my_format;
 
 public class JpaWrappedUserRepository implements UserRepository {
 
@@ -26,6 +27,12 @@ public class JpaWrappedUserRepository implements UserRepository {
     @Override
     public Optional<UserModel> findById(Long userId) {
         return userJpaRepository.findById(userId)
+                .map(userRepositoryMapper::userEntityToUserModel);
+    }
+
+    @Override
+    public Optional<UserModel> findByEmail(String email) {
+        return userJpaRepository.findByEmail(email)
                 .map(userRepositoryMapper::userEntityToUserModel);
     }
 
@@ -51,27 +58,21 @@ public class JpaWrappedUserRepository implements UserRepository {
 
     @Override
     public void changePassword(String email, String newPassword) {
-        if (existsByEmail(email)) {
-            userJpaRepository.findByEmail(email)
-                    .map(userRepositoryMapper::userEntityToUserModel)
-                    .map(user -> user.userWithNewPassword(newPassword))
-                    .map(userRepositoryMapper::userModelToUserEntity)
-                    .map(userJpaRepository::save);
-        }
+        userJpaRepository.findByEmail(email)
+                .map(userRepositoryMapper::userEntityToUserModel)
+                .map(user -> user.userWithNewPassword(newPassword))
+                .map(userRepositoryMapper::userModelToUserEntity)
+                .map(userJpaRepository::save);
     }
 
     @Override
     public Optional<UserModel> changeUser(String email, UpdateUserRequest updateUserRequest) {
-        if (existsByEmail(email)) {
-            return userJpaRepository.findByEmail(email)
-                    .map(userRepositoryMapper::userEntityToUserModel)
-                    .map(user -> user.modifiedUser(updateUserRequest))
-                    .map(userRepositoryMapper::userModelToUserEntity)
-                    .map(userJpaRepository::save)
-                    .map(userRepositoryMapper::userEntityToUserModel);
-        }
-
-        return Optional.empty();
+        return userJpaRepository.findByEmail(email)
+                .map(userRepositoryMapper::userEntityToUserModel)
+                .map(user -> user.modifiedUser(updateUserRequest))
+                .map(userRepositoryMapper::userModelToUserEntity)
+                .map(userJpaRepository::save)
+                .map(userRepositoryMapper::userEntityToUserModel);
     }
 
     @Override
@@ -86,6 +87,20 @@ public class JpaWrappedUserRepository implements UserRepository {
     }
 
     @Override
+    public void payForOrder(Long userId, Double cartValue) {
+        userJpaRepository.findById(userId)
+                .map(user -> deleteFromBalance(cartValue, user))
+                .map(userJpaRepository::save);
+    }
+
+    @Override
+    public void updateAccountBalance(Long userId, Double money) {
+        userJpaRepository.findById(userId)
+                .map(user -> updateBalance(money, user))
+                .map(userJpaRepository::save);
+    }
+
+    @Override
     public boolean existsByUserId(Long userId) {
         return userJpaRepository.existsById(userId);
     }
@@ -93,5 +108,18 @@ public class JpaWrappedUserRepository implements UserRepository {
     @Override
     public boolean existsByEmail(String email) {
         return userJpaRepository.existsByEmail(email);
+    }
+
+    private UserEntity deleteFromBalance(Double cartValue, UserEntity userEntity) {
+        var money = userEntity.getMoney();
+        userEntity.setMoney(my_format(money - cartValue));
+        return userEntity;
+    }
+
+    private UserEntity updateBalance(Double money, UserEntity userEntity) {
+        var balance = userEntity.getMoney();
+        userEntity.setMoney(my_format(balance + money));
+
+        return userEntity;
     }
 }

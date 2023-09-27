@@ -1,5 +1,10 @@
 package configuration;
 
+import com.restaurant.app.cart.repository.delivered.CartDeliveredJpaRepository;
+import com.restaurant.app.cart.repository.delivered.CartDeliveredRepository;
+import com.restaurant.app.cart.repository.delivered.JpaWrappedCartDeliveredRepository;
+import com.restaurant.app.cart.service.delivered.BaseCartDeliveredService;
+import com.restaurant.app.cart.service.delivered.CartDeliveredService;
 import com.restaurant.app.category.repository.CategoryJpaRepository;
 import com.restaurant.app.category.repository.CategoryRepository;
 import com.restaurant.app.category.repository.JpaWrappedCategoryRepository;
@@ -20,6 +25,11 @@ import com.restaurant.app.jwt.repository.JwtJpaRepository;
 import com.restaurant.app.jwt.repository.JwtRepository;
 import com.restaurant.app.jwt.service.BaseJwtService;
 import com.restaurant.app.jwt.service.JwtService;
+import com.restaurant.app.cart.repository.current.JpaWrappedCartRepository;
+import com.restaurant.app.cart.repository.current.CartJpaRepository;
+import com.restaurant.app.cart.repository.current.CartRepository;
+import com.restaurant.app.cart.service.current.BaseCartService;
+import com.restaurant.app.cart.service.current.CartService;
 import com.restaurant.app.user.repository.JpaWrappedUserRepository;
 import com.restaurant.app.user.repository.UserJpaRepository;
 import com.restaurant.app.user.repository.UserRepository;
@@ -82,5 +92,24 @@ public class AppConfig {
     @Bean
     public JwtRepository jwtRepository(JwtJpaRepository jwtJpaRepository) {
         return new JpaWrappedJwtRepository(jwtJpaRepository);
+    }
+
+    @Bean
+    public CartDeliveredService cartDeliveredServiceInterface(CartDeliveredJpaRepository cartDeliveredJpaRepository) {
+        return new BaseCartDeliveredService(cartDeliveredRepositoryInterface(cartDeliveredJpaRepository));
+    }
+
+    private CartDeliveredRepository cartDeliveredRepositoryInterface(
+            CartDeliveredJpaRepository cartDeliveredJpaRepository) {
+        return new JpaWrappedCartDeliveredRepository(cartDeliveredJpaRepository);
+    }
+
+    @Bean
+    public CartService cartServiceInterface(CartJpaRepository cartJpaRepository, CartDeliveredService cartDeliveredService) {
+        return new BaseCartService(cartRepositoryInterface(cartJpaRepository), cartDeliveredService);
+    }
+
+    private CartRepository cartRepositoryInterface(CartJpaRepository cartJpaRepository) {
+        return new JpaWrappedCartRepository(cartJpaRepository);
     }
 }

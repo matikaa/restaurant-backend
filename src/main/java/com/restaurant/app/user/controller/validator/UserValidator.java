@@ -1,6 +1,5 @@
 package com.restaurant.app.user.controller.validator;
 
-import com.restaurant.app.user.controller.LoginRequest;
 import com.restaurant.app.user.controller.dto.*;
 
 public class UserValidator {

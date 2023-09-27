@@ -13,7 +13,7 @@ public record UserModel(
         String role,
         String address,
         String phoneNumber,
-        Long money,
+        Double money,
         Boolean loyaltyCard
 ) {
 
@@ -27,7 +27,7 @@ public record UserModel(
                 "USER",
                 address,
                 phoneNumber,
-                0L,
+                0D,
                 false
         );
     }

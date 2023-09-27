@@ -1,5 +1,6 @@
 package com.restaurant.app.user.repository;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -29,7 +30,8 @@ public class UserEntity {
 
     private String phoneNumber;
 
-    private Long money;
+    @Column(columnDefinition = "DECIMAL(10,2)")
+    private Double money;
 
     private Boolean loyaltyCard;
 
@@ -97,11 +99,11 @@ public class UserEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public Long getMoney() {
+    public Double getMoney() {
         return money;
     }
 
-    public void setMoney(Long money) {
+    public void setMoney(Double money) {
         this.money = money;
     }
 

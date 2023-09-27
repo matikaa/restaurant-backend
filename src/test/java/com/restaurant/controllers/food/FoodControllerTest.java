@@ -25,7 +25,7 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Sauce";
         var foodPositionId = 2L;
-        var foodPrice = 45;
+        var foodPrice = 45D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
@@ -54,11 +54,11 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Mojito";
         var foodPositionId = 2L;
-        var foodPrice = 45;
+        var foodPrice = 45D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var secondFoodName = "Sex on the beach";
-        var secondFoodPrice = 38;
+        var secondFoodPrice = 38D;
         var invalidFoodRequest = createFoodRequest(foodPositionId, secondFoodName, secondFoodPrice);
 
         //when
@@ -93,7 +93,7 @@ class FoodControllerTest extends TestUseCase {
         //given
         var foodName = "Grilled Steak";
         var foodPositionId = 1L;
-        var foodPrice = 34;
+        var foodPrice = 34D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         runAsAdmin();
@@ -119,7 +119,7 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Roast Chicken";
         var foodPositionId = 2L;
-        var foodPrice = 45;
+        var foodPrice = 45D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
@@ -158,7 +158,7 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Ice Cream";
         var foodPositionId = 2L;
-        var foodPrice = 45;
+        var foodPrice = 45D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
@@ -193,7 +193,7 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Caesar Salad";
         var foodPositionId = 2L;
-        var foodPrice = 45;
+        var foodPrice = 45D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         //when
@@ -252,17 +252,17 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Fillet";
         var foodPositionId = 1L;
-        var foodPrice = 45;
+        var foodPrice = 45D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var foodName2 = "Tomato spaghetti";
         var foodPositionId2 = 2L;
-        var foodPrice2 = 27;
+        var foodPrice2 = 27D;
         var foodRequest2 = createFoodRequest(foodPositionId2, foodName2, foodPrice2);
 
         var foodName3 = "Lasagna";
         var foodPositionId3 = 1L;
-        var foodPrice3 = 21;
+        var foodPrice3 = 21D;
         var foodRequest3 = createFoodRequest(foodPositionId3, foodName3, foodPrice3);
 
         //when
@@ -328,7 +328,7 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Tomato soup";
         var foodPositionId = 2L;
-        var foodPrice = 24;
+        var foodPrice = 24D;
         var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
 
         //when
@@ -353,7 +353,7 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Tomato soup";
         var foodPositionId = 2L;
-        var foodPrice = 24;
+        var foodPrice = 24D;
         var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
 
         //when
@@ -379,7 +379,7 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Tomato soup";
         var foodPositionId = 2L;
-        var foodPrice = 24;
+        var foodPrice = 24D;
         var savedFood = saveFood(savedCategory.categoryId(), foodName, foodPrice, foodPositionId);
 
         var incorrectFoodId = -1L;
@@ -407,11 +407,11 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Earl grey";
         var foodPositionId = 1L;
-        var foodPrice = 15;
+        var foodPrice = 15D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var secPositionId = 3L;
-        var secFoodPrice = 63;
+        var secFoodPrice = 63D;
         var updateFoodRequest = createFoodRequestUpdate(savedCategory.categoryId(), secPositionId, foodName, secFoodPrice);
 
         //when
@@ -467,11 +467,11 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Cappuccino";
         var foodPositionId = 5L;
-        var foodPrice = 6;
+        var foodPrice = 6D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var secPositionId = 2L;
-        var secFoodPrice = 15;
+        var secFoodPrice = 15D;
         var updateFoodRequest = createFoodRequestUpdate(savedCategory.categoryId(), secPositionId, foodName, secFoodPrice);
 
         //when
@@ -508,11 +508,11 @@ class FoodControllerTest extends TestUseCase {
 
         var foodName = "Cappuccino";
         var foodPositionId = 5L;
-        var foodPrice = 6;
+        var foodPrice = 6D;
         var foodRequest = createFoodRequest(foodPositionId, foodName, foodPrice);
 
         var secPositionId = 2L;
-        var secFoodPrice = 15;
+        var secFoodPrice = 15D;
         var updateFoodRequest = createFoodRequestUpdate(savedCategory.categoryId(), secPositionId, foodName, secFoodPrice);
 
         //when

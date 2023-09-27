@@ -1,7 +1,7 @@
 package com.restaurant.app.category.service;
 
-import com.restaurant.app.category.service.dto.Category;
 import com.restaurant.app.category.repository.entity.CategoryModel;
+import com.restaurant.app.category.service.dto.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

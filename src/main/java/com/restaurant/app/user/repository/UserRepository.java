@@ -10,6 +10,10 @@ public interface UserRepository {
 
     Optional<UserModel> findById(Long userId);
 
+    Optional<UserModel> findByEmail(String email);
+
+    void payForOrder(Long userId, Double cartValue);
+
     List<UserModel> findAll();
 
     UserModel save(UserModel userRequest);
@@ -27,4 +31,6 @@ public interface UserRepository {
     void deleteById(Long userId);
 
     boolean existsByUserId(Long userId);
+
+    void updateAccountBalance(Long userId, Double money);
 }

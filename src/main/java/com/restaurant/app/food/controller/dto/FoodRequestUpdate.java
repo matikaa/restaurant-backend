@@ -4,6 +4,6 @@ public record FoodRequestUpdate(
         Long categoryId,
         Long positionId,
         String foodName,
-        Integer foodPrice
+        Double foodPrice
 ) {
 }

@@ -5,6 +5,6 @@ public record Food(
         Long categoryId,
         Long positionId,
         String foodName,
-        Integer foodPrice
+        Double foodPrice
 ) {
 }

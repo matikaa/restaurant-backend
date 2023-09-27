@@ -10,7 +10,7 @@ public record UserResponse(
         String role,
         String address,
         String phoneNumber,
-        Long money,
+        Double money,
         Boolean loyaltyCard
 ) {
 }

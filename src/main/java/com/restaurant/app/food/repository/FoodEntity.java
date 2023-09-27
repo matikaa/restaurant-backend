@@ -1,5 +1,6 @@
 package com.restaurant.app.food.repository;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -19,7 +20,8 @@ public class FoodEntity {
 
     String foodName;
 
-    Integer foodPrice;
+    @Column(columnDefinition = "DECIMAL(10,2)")
+    Double foodPrice;
 
     public Long getFoodId() {
         return foodId;
@@ -53,11 +55,11 @@ public class FoodEntity {
         this.foodName = foodName;
     }
 
-    public Integer getFoodPrice() {
+    public Double getFoodPrice() {
         return foodPrice;
     }
 
-    public void setFoodPrice(Integer foodPrice) {
+    public void setFoodPrice(Double foodPrice) {
         this.foodPrice = foodPrice;
     }
 }

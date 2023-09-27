@@ -1,6 +1,5 @@
 package com.restaurant.controllers.user;
 
-import com.restaurant.app.user.controller.LoginRequest;
 import com.restaurant.app.user.controller.dto.*;
 import com.restaurant.controllers.TestUseCase;
 import org.junit.jupiter.api.DisplayName;
@@ -643,12 +642,12 @@ class UserControllerTest extends TestUseCase {
     @DisplayName("Should not change user password by wrong userId and return 404 NOT FOUND")
     void shouldNotChangeUserPasswordByWrongUserIdAndReturnNotFound() {
         //given
-        var email = "anna.nowak@example.com";
-        var name = "Anna";
-        var password = "dpksao3@$@44";
-        var address = "ul. Kwiatowa 12, 00-123 Warszawa";
-        var phoneNumber = "123456789";
-        var newPassword = "sda$@$daSDA2#";
+        var email = "adam.nowak@example.com";
+        var name = "Adam";
+        var password = "dGhpcygd29ya3Mh";
+        var address = "ul. Lipowa 56, 12-345 Gdansk";
+        var phoneNumber = "424521455";
+        var newPassword = "s3gg3ADF1!!%f";
 
         var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
         saveUser(createUserRequest);
@@ -662,6 +661,81 @@ class UserControllerTest extends TestUseCase {
                 prepareUserPasswordUrlWithUserId(WRONG_ID),
                 PUT,
                 createBody(userChangedPasswordRequest),
+                Void.class
+        );
+
+        //then
+        assertThat(changedPasswordResponse.getStatusCode(), is(equalTo(NOT_FOUND)));
+    }
+
+    @Test
+    @DisplayName("Should update user balance return 200 OK")
+    void shouldUpdateUserBalanceAndReturnOk() {
+        //given
+        var email = "jan.kowalski@gmail.com";
+        var name = "Jan";
+        var password = "p42Fas0$$";
+        var address = "ul. Sloneczna 34, 12-345 Krakow";
+        var phoneNumber = "924857432";
+        var userMoney = 40D;
+        var secUserMoney = 95D;
+
+        var createUserRequest = new UserRequest(email, name, password, address, phoneNumber);
+        var createdUser = saveUser(createUserRequest);
+
+        var userMoneyRequest = new UserMoney(userMoney);
+        var secUserMoneyRequest = new UserMoney(secUserMoney);
+
+        //when
+        runAsAdmin();
+
+        var changedPasswordResponse = client.exchange(
+                prepareUserBalanceUrlWithUserId(createdUser.userId()),
+                PUT,
+                createBody(userMoneyRequest),
+                Void.class
+        );
+
+        //then
+        assertThat(changedPasswordResponse.getStatusCode(), is(equalTo(OK)));
+
+        //when
+        changedPasswordResponse = client.exchange(
+                prepareUserBalanceUrlWithUserId(createdUser.userId()),
+                PUT,
+                createBody(secUserMoneyRequest),
+                Void.class
+        );
+
+        //then
+        assertThat(changedPasswordResponse.getStatusCode(), is(equalTo(OK)));
+
+        //when
+        var userResponse = client.getForEntity(
+                prepareUserUrlWithUserId(createdUser.userId()),
+                UserResponse.class
+        );
+
+        //then
+        assertThat(userResponse.getStatusCode(), is(equalTo(OK)));
+        assertThat(userResponse.getBody(), is(notNullValue()));
+        assertThat(userResponse.getBody().money(), is(equalTo(userMoney + secUserMoney)));
+    }
+
+    @Test
+    @DisplayName("Should not update user balance by wrong userId return 404 NOT FOUND")
+    void shouldNotUpdateUserBalanceByWrongUserIdAndReturnNotFound() {
+        //given
+        var userMoney = 40D;
+        var userMoneyRequest = new UserMoney(userMoney);
+
+        //when
+        runAsAdmin();
+
+        var changedPasswordResponse = client.exchange(
+                prepareUserBalanceUrlWithUserId(WRONG_ID),
+                PUT,
+                createBody(userMoneyRequest),
                 Void.class
         );
 
