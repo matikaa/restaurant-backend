@@ -86,7 +86,7 @@ public class CartController {
             return ResponseEntity.notFound().build();
         }
 
-        userService.completeOrder(userId, getcartValue(cart));
+        userService.completeOrder(userId, getCartValue(cart));
         cartService.changeStatus(userId);
 
         return ResponseEntity.ok().body(
@@ -178,7 +178,7 @@ public class CartController {
             return ResponseEntity.notFound().build();
         }
 
-        if (cartService.getOrderStatus(userId).equals(Status.EMPTY_ORDER)) {
+        if (!cartService.getOrderStatus(userId).equals(Status.IN_ORDER)) {
             LOGGER.warn(ConstantValues.EMPTY_CART);
             return ResponseEntity.status(CONFLICT).build();
         }
@@ -204,7 +204,7 @@ public class CartController {
         return userService.getUserByEmail(userEmail);
     }
 
-    private Double getcartValue(Optional<Cart> cartModel) {
+    private Double getCartValue(Optional<Cart> cartModel) {
         return ConstantValues.my_format(cartModel.get().cartValue());
     }
 
