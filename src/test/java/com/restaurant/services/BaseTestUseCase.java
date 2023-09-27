@@ -1,9 +1,9 @@
 package com.restaurant.services;
 
-import com.restaurant.app.cart.repository.current.dto.CartModel;
-import com.restaurant.app.cart.service.current.dto.Cart;
-import com.restaurant.app.food.service.dto.Food;
-import com.restaurant.app.user.service.dto.User;
+import com.restaurant.cart.repository.current.dto.CartModel;
+import com.restaurant.cart.service.current.dto.Cart;
+import com.restaurant.food.service.dto.Food;
+import com.restaurant.user.service.dto.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

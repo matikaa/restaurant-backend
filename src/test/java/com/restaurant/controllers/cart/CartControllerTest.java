@@ -1,7 +1,7 @@
 package com.restaurant.controllers.cart;
 
-import com.restaurant.app.cart.controller.dto.CartDeliveredResponse;
-import com.restaurant.app.cart.controller.dto.CartResponse;
+import com.restaurant.cart.controller.dto.CartDeliveredResponse;
+import com.restaurant.cart.controller.dto.CartResponse;
 import com.restaurant.controllers.TestUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

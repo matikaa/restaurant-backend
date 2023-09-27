@@ -1,16 +1,16 @@
 package com.restaurant.services.cart;
 
-import com.restaurant.app.cart.repository.current.CartRepository;
-import com.restaurant.app.cart.repository.current.dto.CartModel;
-import com.restaurant.app.cart.repository.delivered.CartDeliveredRepository;
-import com.restaurant.app.cart.service.current.BaseCartService;
-import com.restaurant.app.cart.service.current.dto.Cart;
-import com.restaurant.app.cart.service.delivered.BaseCartDeliveredService;
-import com.restaurant.app.cart.service.delivered.CartDeliveredService;
-import com.restaurant.app.cart.service.delivered.dto.CartDelivered;
-import com.restaurant.app.common.Status;
-import com.restaurant.app.food.service.dto.Food;
-import com.restaurant.app.user.service.dto.User;
+import com.restaurant.cart.repository.current.CartRepository;
+import com.restaurant.cart.repository.current.dto.CartModel;
+import com.restaurant.cart.repository.delivered.CartDeliveredRepository;
+import com.restaurant.cart.service.current.BaseCartService;
+import com.restaurant.cart.service.current.dto.Cart;
+import com.restaurant.cart.service.delivered.BaseCartDeliveredService;
+import com.restaurant.cart.service.delivered.CartDeliveredService;
+import com.restaurant.cart.service.delivered.dto.CartDelivered;
+import com.restaurant.common.Status;
+import com.restaurant.food.service.dto.Food;
+import com.restaurant.user.service.dto.User;
 import com.restaurant.services.BaseTestUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.restaurant.app.common.ConstantValues.DISCOUNT;
+import static com.restaurant.common.ConstantValues.DISCOUNT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;

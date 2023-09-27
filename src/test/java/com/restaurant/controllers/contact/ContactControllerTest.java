@@ -1,7 +1,7 @@
 package com.restaurant.controllers.contact;
 
-import com.restaurant.app.contact.controller.dto.ContactRequestResponse;
-import com.restaurant.app.contact.controller.dto.ContactResponse;
+import com.restaurant.contact.controller.dto.ContactRequestResponse;
+import com.restaurant.contact.controller.dto.ContactResponse;
 import com.restaurant.controllers.TestUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
