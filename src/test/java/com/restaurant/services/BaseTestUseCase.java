@@ -2,6 +2,8 @@ package com.restaurant.services;
 
 import com.restaurant.cart.repository.current.dto.CartModel;
 import com.restaurant.cart.service.current.dto.Cart;
+import com.restaurant.contact.repository.dto.ContactModel;
+import com.restaurant.contact.service.dto.Contact;
 import com.restaurant.food.service.dto.Food;
 import com.restaurant.user.service.dto.User;
 
@@ -77,6 +79,34 @@ public class BaseTestUseCase {
                 cartModel.cartValue(),
                 cartModel.food(),
                 cartModel.foodPrice()
+        );
+    }
+
+    public Contact createContact(Long contactId){
+        return new Contact(
+                contactId,
+                "contact@mail.com",
+                "421932043",
+                "monday-saturday",
+                "9.00",
+                "21.00",
+                "Warsaw",
+                "Golden Street",
+                42
+        );
+    }
+
+    public ContactModel createContactModel(Long contactId){
+        return new ContactModel(
+                contactId,
+                "contact@mail.com",
+                "421932043",
+                "monday-saturday",
+                "9.00",
+                "21.00",
+                "Warsaw",
+                "Golden Street",
+                42
         );
     }
 }
