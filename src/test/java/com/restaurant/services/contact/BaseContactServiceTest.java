@@ -14,8 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BaseContactServiceTest extends BaseTestUseCase {
@@ -76,5 +76,36 @@ class BaseContactServiceTest extends BaseTestUseCase {
 
         //assert
         assertEquals(contact, updatedContact);
+    }
+
+    @Test
+    @DisplayName("Should return true when contact exists by Id")
+    void shouldReturnTrueWhenExistsById() {
+        //given
+        Long contactId = 15L;
+        boolean contactExist = true;
+
+        when(contactRepository.existsById(contactId)).thenReturn(contactExist);
+
+        //when
+        boolean existsResult = baseContactService.existsById(contactId);
+
+        //then
+        assertEquals(contactExist, existsResult);
+    }
+
+    @Test
+    @DisplayName("Should return that any contact exists")
+    void shouldReturnThatAnyContactExists() {
+        //given
+        boolean anyContactExists = true;
+
+        when(contactRepository.existsAny()).thenReturn(anyContactExists);
+
+        //when
+        boolean anyContactExistsResult = baseContactService.existsAny();
+
+        //then
+        assertEquals(anyContactExists, anyContactExistsResult);
     }
 }
