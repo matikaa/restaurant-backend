@@ -4,6 +4,8 @@ import com.restaurant.cart.repository.current.dto.CartModel;
 import com.restaurant.cart.service.current.dto.Cart;
 import com.restaurant.contact.repository.dto.ContactModel;
 import com.restaurant.contact.service.dto.Contact;
+import com.restaurant.food.controller.dto.FoodRequest;
+import com.restaurant.food.repository.dto.FoodModel;
 import com.restaurant.food.service.dto.Food;
 import com.restaurant.user.service.dto.User;
 
@@ -44,6 +46,44 @@ public class BaseTestUseCase {
         return new Food(
                 1L,
                 1L,
+                1L,
+                "Beer",
+                50D
+        );
+    }
+
+    public Food getFoodToUpdate() {
+        return new Food(
+                2L,
+                6L,
+                3L,
+                "spaghetti bolognese",
+                85D
+        );
+    }
+
+    public FoodModel getFoodModel() {
+        return new FoodModel(
+                1L,
+                1L,
+                1L,
+                "Beer",
+                50D
+        );
+    }
+
+    public FoodModel getFoodModelToUpdate() {
+        return new FoodModel(
+                2L,
+                6L,
+                3L,
+                "spaghetti bolognese",
+                85D
+        );
+    }
+
+    public FoodRequest getFoodRequest() {
+        return new FoodRequest(
                 1L,
                 "Beer",
                 50D
