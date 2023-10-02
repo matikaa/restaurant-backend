@@ -7,9 +7,15 @@ import com.restaurant.contact.service.dto.Contact;
 import com.restaurant.food.controller.dto.FoodRequest;
 import com.restaurant.food.repository.dto.FoodModel;
 import com.restaurant.food.service.dto.Food;
+import com.restaurant.user.controller.dto.UpdateUserRequest;
+import com.restaurant.user.controller.dto.UserRequest;
+import com.restaurant.user.repository.dto.UserModel;
 import com.restaurant.user.service.dto.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public class BaseTestUseCase {
@@ -19,7 +25,7 @@ public class BaseTestUseCase {
                 1L,
                 "michael@gmail.com",
                 "Michael",
-                LocalDateTime.now(),
+                LocalDateTime.now().withNano(0),
                 "USER",
                 "Wall street 55, 00-355 Florida",
                 "0359683552",
@@ -33,13 +39,100 @@ public class BaseTestUseCase {
                 1L,
                 "michael@gmail.com",
                 "Michael",
-                LocalDateTime.now(),
+                LocalDateTime.now().withNano(0),
                 "USER",
                 "Wall street 55, 00-355 Florida",
                 "0359683552",
                 25D,
                 false
         );
+    }
+
+    public UserModel getUserModel() {
+        return new UserModel(
+                1L,
+                "michael@gmail.com",
+                "Michael",
+                "password123",
+                LocalDateTime.now().withNano(0),
+                "USER",
+                "Wall street 55, 00-355 Florida",
+                "0359683552",
+                1250D,
+                true
+        );
+    }
+
+    public UserModel getUserModelToSave() {
+        return new UserModel(
+                null,
+                "michael@gmail.com",
+                "Michael",
+                null,
+                LocalDateTime.now().withNano(0),
+                "USER",
+                "Wall street 55, 00-355 Florida",
+                "0359683552",
+                0D,
+                false
+        );
+    }
+
+    public UserRequest getUserRequest() {
+        return new UserRequest(
+                "michael@gmail.com",
+                "Michael",
+                "password123",
+                "Wall street 55, 00-355 Florida",
+                "0359683552"
+        );
+    }
+
+    public UpdateUserRequest getUpdateUserRequest() {
+        return new UpdateUserRequest(
+                "Michael",
+                "Wall street 55, 00-355 Florida",
+                "0359683552"
+        );
+    }
+
+    public Authentication getAuthentication() {
+        return new Authentication() {
+            @Override
+            public Collection<? extends GrantedAuthority> getAuthorities() {
+                return null;
+            }
+
+            @Override
+            public Object getCredentials() {
+                return null;
+            }
+
+            @Override
+            public Object getDetails() {
+                return null;
+            }
+
+            @Override
+            public Object getPrincipal() {
+                return null;
+            }
+
+            @Override
+            public boolean isAuthenticated() {
+                return true;
+            }
+
+            @Override
+            public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+        };
     }
 
     public Food getFood() {
