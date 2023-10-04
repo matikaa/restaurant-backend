@@ -7,7 +7,9 @@ import com.restaurant.contact.service.dto.Contact;
 import com.restaurant.food.controller.dto.FoodRequest;
 import com.restaurant.food.repository.dto.FoodModel;
 import com.restaurant.food.service.dto.Food;
+import com.restaurant.user.controller.dto.ChangePasswordRequest;
 import com.restaurant.user.controller.dto.UpdateUserRequest;
+import com.restaurant.user.controller.dto.UserChangePasswordRequest;
 import com.restaurant.user.controller.dto.UserRequest;
 import com.restaurant.user.repository.dto.UserModel;
 import com.restaurant.user.service.dto.User;
@@ -93,6 +95,19 @@ public class BaseTestUseCase {
                 "Michael",
                 "Wall street 55, 00-355 Florida",
                 "0359683552"
+        );
+    }
+
+    public ChangePasswordRequest getChangePasswordRequest() {
+        return new ChangePasswordRequest(
+                "password123",
+                "StrongPassword@123"
+        );
+    }
+
+    public UserChangePasswordRequest getUserChangePasswordRequest() {
+        return new UserChangePasswordRequest(
+                "StrongPassword@123"
         );
     }
 
@@ -215,7 +230,7 @@ public class BaseTestUseCase {
         );
     }
 
-    public Contact createContact(Long contactId){
+    public Contact createContact(Long contactId) {
         return new Contact(
                 contactId,
                 "contact@mail.com",
@@ -229,7 +244,7 @@ public class BaseTestUseCase {
         );
     }
 
-    public ContactModel createContactModel(Long contactId){
+    public ContactModel createContactModel(Long contactId) {
         return new ContactModel(
                 contactId,
                 "contact@mail.com",

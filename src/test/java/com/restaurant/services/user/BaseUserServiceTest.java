@@ -1,9 +1,7 @@
 package com.restaurant.services.user;
 
 import com.restaurant.services.BaseTestUseCase;
-import com.restaurant.user.controller.dto.LoginRequest;
-import com.restaurant.user.controller.dto.UpdateUserRequest;
-import com.restaurant.user.controller.dto.UserRequest;
+import com.restaurant.user.controller.dto.*;
 import com.restaurant.user.repository.UserRepository;
 import com.restaurant.user.repository.dto.UserModel;
 import com.restaurant.user.service.BaseUserService;
@@ -17,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +35,9 @@ class BaseUserServiceTest extends BaseTestUseCase {
 
     @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Test
     @DisplayName("Should return list of all users")
@@ -149,5 +151,110 @@ class BaseUserServiceTest extends BaseTestUseCase {
         assertEquals(userUpdated, userUpdateResult);
     }
 
+    @Test
+    @DisplayName("Should change password")
+    void shouldChangePassword() {
+        //given
+        String email = "mat@email.com";
+        String password = "password123";
+        ChangePasswordRequest passwordRequest = getChangePasswordRequest();
+        boolean passwordChanged = true;
+        boolean passwordMatches = true;
+        boolean existsByEmail = true;
 
+        when(userRepository.existsByEmail(email)).thenReturn(existsByEmail);
+        when(userRepository.getCurrentPassword(email)).thenReturn(password);
+        when(passwordEncoder.matches(passwordRequest.currentPassword(), password)).thenReturn(passwordMatches);
+
+        //when
+        boolean changePasswordResult = baseUserService.changePassword(email, passwordRequest);
+
+        //then
+        assertEquals(passwordChanged, changePasswordResult);
+    }
+
+    @Test
+    @DisplayName("Should change user password")
+    void shouldChangeUserPassword() {
+        //given
+        Long userId = 1L;
+        boolean userExists = true;
+        UserChangePasswordRequest passwordRequest = getUserChangePasswordRequest();
+        boolean passwordChanged = true;
+        Optional<UserModel> userModel = Optional.of(getUserModel());
+
+        when(userRepository.existsByUserId(userId)).thenReturn(userExists);
+        when(userRepository.findById(userId)).thenReturn(userModel);
+
+        //when
+        boolean changePasswordResult = baseUserService.changeUserPassword(userId, passwordRequest);
+
+        //then
+        assertEquals(passwordChanged, changePasswordResult);
+    }
+
+    @Test
+    @DisplayName("Should verify password")
+    void shouldVerifyPassword() {
+        //given
+        String email = "mario@email.com";
+        String password = "password123";
+        boolean passwordVerified = true;
+        boolean passwordMatches = true;
+
+        when(userRepository.getCurrentPassword(email)).thenReturn(password);
+        when(passwordEncoder.matches(password, password)).thenReturn(passwordMatches);
+
+        //when
+        boolean verifyPasswordResult = baseUserService.verifyPassword(email, password);
+
+        //then
+        assertEquals(passwordVerified, verifyPasswordResult);
+    }
+
+    @Test
+    @DisplayName("Should return that user exists when existsByEmail")
+    void shouldReturnTrueWhenExistsByEmail() {
+        //given
+        String email = "peter@email.com";
+        boolean userExists = true;
+
+        when(userRepository.existsByEmail(email)).thenReturn(userExists);
+
+        //when
+        boolean userExistsResult = baseUserService.existsUserByEmail(email);
+
+        //then
+        assertEquals(userExists, userExistsResult);
+    }
+
+    @Test
+    @DisplayName("Should return that user exists by userId")
+    void shouldReturnTrueWhenUserExitsByUserId() {
+        //given
+        Long userId = 1L;
+        boolean userExists = true;
+
+        when(userRepository.existsByUserId(userId)).thenReturn(userExists);
+
+        //when
+        boolean userExistsResult = baseUserService.existsByUserId(userId);
+
+        //then
+        assertEquals(userExists, userExistsResult);
+    }
+
+    @Test
+    @DisplayName("Should validate email")
+    void shouldValidateEmail() {
+        //given
+        String email = "matty@email.com";
+        boolean emailValid = true;
+
+        //when
+        boolean validateEmailResult = baseUserService.isValidEmail(email);
+
+        //then
+        assertEquals(emailValid, validateEmailResult);
+    }
 }
