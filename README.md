@@ -34,6 +34,6 @@ Before running the application, ensure you have correctly configured the Postgre
 
 The API documentation is available at [localhost:8080/docs/openapi](http://localhost:8080/docs/openapi) after running the application.
 
-Author
+## Authors
 - [Matikaa](https://github.com/matikaa)
 - [MarcinFrejnagel](https://github.com/MarcinFrejnagel)
