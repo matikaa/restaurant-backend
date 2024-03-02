@@ -10,7 +10,7 @@ This project is part of a comprehensive system designed to assist restaurant man
 
 - Java 8 or higher
 - Maven
-- MySQL database or any other compatible with Spring Data JPA technology
+- PostgreSQL database or any other compatible with Spring Data JPA technology
 
 ## Installation and Running
 
@@ -21,17 +21,18 @@ git clone https://github.com/matikaa/restaurant-backend.git
 ```
 ## Configuration
 
-Before running the application, ensure you have correctly configured the MySQL database. By default, the database configuration is located in the application.properties file.
+Before running the application, ensure you have correctly configured the PostgreSQL database. By default, the database configuration is located in the application.properties file.
 
 ## Technologies Used
 
-Spring Boot
-Spring Security
-Spring Data JPA
-MySQL
-Maven
-API Documentation
-The API documentation is available at localhost:8080/swagger-ui.html after running the application.
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- PostgreSQL
+- Maven
+- API Documentation (Swagger)
+
+The API documentation is available at [localhost:8080/docs/openapi](http://localhost:8080/docs/openapi) after running the application.
 
 Author
 - [Matikaa](https://github.com/matikaa)
