@@ -18,7 +18,7 @@ This project is part of a comprehensive system designed to assist restaurant man
 
 ```bash
 git clone https://github.com/matikaa/restaurant-backend.git
-
+```
 ## Configuration
 
 Before running the application, ensure you have correctly configured the MySQL database. By default, the database configuration is located in the application.properties file.
