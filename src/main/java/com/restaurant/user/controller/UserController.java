@@ -54,8 +54,8 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<UserRequestResponse> addUser(@RequestBody UserRequest userRequest) {
+    @PostMapping("/register")
+    public ResponseEntity<UserRequestResponse> register(@RequestBody UserRequest userRequest) {
         if (userValidator.isUserRequestNotValid(userRequest)) {
             LOGGER.warn(ConstantValues.INVALID_REQUEST_BODY);
             return ResponseEntity.badRequest().build();

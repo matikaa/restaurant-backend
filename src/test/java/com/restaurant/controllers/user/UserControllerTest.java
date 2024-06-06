@@ -29,7 +29,7 @@ class UserControllerTest extends TestUseCase {
 
         //when
         var userResponse = client.postForEntity(
-                prepareUrl(USER_RESOURCE),
+                prepareUrl(USER_RESOURCE) + "/register",
                 createUserRequest,
                 UserRequestResponse.class
         );
@@ -58,7 +58,7 @@ class UserControllerTest extends TestUseCase {
 
         //when
         var userResponse = client.postForEntity(
-                prepareUrl(USER_RESOURCE),
+                prepareUrl(USER_RESOURCE) + "/register",
                 createUserRequest,
                 String.class
         );
@@ -86,7 +86,7 @@ class UserControllerTest extends TestUseCase {
 
         //when
         var userResponse = client.postForEntity(
-                prepareUrl(USER_RESOURCE),
+                prepareUrl(USER_RESOURCE) + "/register",
                 createUserRequest,
                 UserRequestResponse.class
         );
@@ -103,7 +103,7 @@ class UserControllerTest extends TestUseCase {
 
         //when
         var secUserResponse = client.postForEntity(
-                prepareUrl(USER_RESOURCE),
+                prepareUrl(USER_RESOURCE) + "/register",
                 secCreateUserRequest,
                 String.class
         );

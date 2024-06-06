@@ -199,7 +199,7 @@ public class TestUseCase {
     protected UserRequestResponse saveUser(UserRequest userRequest) {
         //when
         var userResponse = client.postForEntity(
-                prepareUrl(USER_RESOURCE),
+                prepareUrl(USER_RESOURCE) + "/register",
                 userRequest,
                 UserRequestResponse.class
         );
