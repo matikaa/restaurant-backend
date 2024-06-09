@@ -1,12 +1,9 @@
-package com.restaurant.cart.repository.delivered.dto;
+package com.restaurant.cart.controller.dto;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public record CartDeliveredModel(
-        Long cartId,
-        Long userId,
-        Boolean loyaltyCard,
+public record CartResponseDelivered(
         Double cartValue,
         List<String> food,
         List<Double> foodPrice,

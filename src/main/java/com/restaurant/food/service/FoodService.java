@@ -21,4 +21,8 @@ public interface FoodService {
     Optional<Food> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId);
 
     boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId);
+
+    Optional<Food> getFoodByNameAndPrice(String foodName, Double foodPrice);
+
+    void deleteByCategoryId(Long categoryId);
 }

@@ -3,6 +3,8 @@ package com.restaurant.category.controller;
 import com.restaurant.category.controller.dto.*;
 import com.restaurant.category.controller.validator.CategoryValidator;
 import com.restaurant.category.service.CategoryService;
+import com.restaurant.food.service.FoodService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,12 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    private final FoodService foodService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CategoryController.class);
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(CategoryService categoryService, FoodService foodService) {
+        this.foodService = foodService;
         this.categoryValidator = new CategoryValidator();
         this.categoryService = categoryService;
     }
@@ -73,12 +78,14 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     @PreAuthorize("hasAuthority('ADMIN')")
+    @Transactional
     public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
         if (!categoryService.existsByCategoryId(categoryId)) {
             LOGGER.warn(CATEGORY_NOT_EXISTS);
             return ResponseEntity.notFound().build();
         }
 
+        foodService.deleteByCategoryId(categoryId);
         categoryService.delete(categoryId);
 
         return ResponseEntity.ok().build();
@@ -86,6 +93,7 @@ public class CategoryController {
 
     @PutMapping("/{categoryId}")
     @PreAuthorize("hasAuthority('ADMIN')")
+    @Transactional
     public ResponseEntity<CategoryResponse> update(@PathVariable Long categoryId,
                                                    @RequestBody UpdateCategoryRequest updateCategoryRequest) {
         if (categoryValidator.isUpdateCategoryRequestNotValid(updateCategoryRequest)) {

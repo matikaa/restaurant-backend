@@ -1,6 +1,8 @@
 package com.restaurant.cart.service.delivered;
 
+import com.restaurant.cart.controller.dto.OrderDate;
 import com.restaurant.cart.repository.current.dto.CartModel;
+import com.restaurant.cart.service.current.dto.SoldFoodSummary;
 import com.restaurant.cart.service.delivered.dto.CartDelivered;
 
 import java.util.List;
@@ -15,4 +17,8 @@ public interface CartDeliveredService {
     boolean existsByUserId(Long userId);
 
     Double sumAll(Long userId);
+
+    Double sumAllSoldFood(OrderDate orderDate);
+
+    List<SoldFoodSummary> findAllUsersOrders(OrderDate orderDate);
 }

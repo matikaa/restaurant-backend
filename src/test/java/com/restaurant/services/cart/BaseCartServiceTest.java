@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -235,7 +236,7 @@ class BaseCartServiceTest extends BaseTestUseCase {
         User user = getWithUser();
 
         CartDelivered secCart = new CartDelivered(
-                1L, 1L, true, 50D, List.of("Beer"), List.of(55D)
+                1L, 1L, true, 50D, List.of("Beer"), List.of(55D), ZonedDateTime.now()
         );
 
         List<CartDelivered> carts = new ArrayList<>();

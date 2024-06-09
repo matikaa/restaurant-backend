@@ -19,4 +19,10 @@ public interface FoodRepository {
     Optional<FoodModel> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId);
 
     boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId);
+
+    Optional<FoodModel> getFoodByFoodNameAndFoodPrice(String foodName, Double foodPrice);
+
+    List<FoodModel> getFood();
+
+    void deleteByCategoryId(Long categoryId);
 }

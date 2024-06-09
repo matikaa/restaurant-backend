@@ -4,6 +4,6 @@ import java.util.List;
 
 public record CartDeliveredResponse(
         Double overallCartValue,
-        List<CartResponse> cartResponses
+        List<CartResponseDelivered> cartResponses
 ) {
 }

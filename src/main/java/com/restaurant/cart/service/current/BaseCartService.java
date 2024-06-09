@@ -1,7 +1,9 @@
 package com.restaurant.cart.service.current;
 
+import com.restaurant.cart.controller.dto.OrderDate;
 import com.restaurant.cart.repository.current.CartRepository;
 import com.restaurant.cart.service.current.dto.Cart;
+import com.restaurant.cart.service.current.dto.SoldFoodSummary;
 import com.restaurant.cart.service.delivered.CartDeliveredService;
 import com.restaurant.cart.service.delivered.dto.CartDelivered;
 import com.restaurant.common.ConstantValues;
@@ -35,7 +37,9 @@ public class BaseCartService implements CartService {
         if (cartRepository.existsByUserId(user.userId())) {
             cartValue = cartRepository.findValueOfCartByUserId(user.userId());
         } else {
-            cartRepository.insert(user.userId());
+            if (user.money() >= sumAllExpenses(cartValue, foodPrice, user.loyaltyCard())) {
+                cartRepository.insert(user.userId());
+            }
         }
 
         if (user.money() >= sumAllExpenses(cartValue, foodPrice, user.loyaltyCard())) {
@@ -55,6 +59,15 @@ public class BaseCartService implements CartService {
     @Override
     public Optional<Cart> getCart(Long userId) {
         if (getOrderStatus(userId).equals(Status.IN_ORDER)) {
+            return cartServiceMapper.cartModelToCart(cartRepository.findCartByUserId(userId));
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Cart> getInDeliveryCart(Long userId) {
+        if (getOrderStatus(userId).equals(Status.IN_DELIVERY)) {
             return cartServiceMapper.cartModelToCart(cartRepository.findCartByUserId(userId));
         }
 
@@ -103,6 +116,16 @@ public class BaseCartService implements CartService {
         }
 
         return 0D;
+    }
+
+    @Override
+    public Double getValueOfAllOrders(OrderDate orderDate) {
+        return cartDeliveredService.sumAllSoldFood(orderDate);
+    }
+
+    @Override
+    public List<SoldFoodSummary> getOverallSoldFood(OrderDate orderDate) {
+        return cartDeliveredService.findAllUsersOrders(orderDate);
     }
 
     @Override

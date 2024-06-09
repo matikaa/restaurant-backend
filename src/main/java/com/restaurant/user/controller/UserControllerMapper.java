@@ -1,9 +1,8 @@
 package com.restaurant.user.controller;
 
-import com.restaurant.user.controller.dto.LoginRequestResponse;
-import com.restaurant.user.controller.dto.UserRequestResponse;
-import com.restaurant.user.controller.dto.UserResponse;
+import com.restaurant.user.controller.dto.*;
 import com.restaurant.user.service.dto.User;
+import com.restaurant.user.service.dto.UserLogin;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -18,7 +17,11 @@ public interface UserControllerMapper {
 
     UserResponse userToUserResponse(User user);
 
+    UserRole userToUserRole(User user);
+
+    UserMoney userToUserMoney(User user);
+
     UserRequestResponse userToUserRequestResponse(User user);
 
-    LoginRequestResponse stringToLoginRequestResponse(String token);
+    LoginRequestResponse userLoginToLoginRequestResponse(UserLogin userLogin);
 }

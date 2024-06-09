@@ -2,6 +2,7 @@ package com.restaurant.user.service;
 
 import com.restaurant.user.controller.dto.*;
 import com.restaurant.user.service.dto.User;
+import com.restaurant.user.service.dto.UserLogin;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public interface UserService {
 
     boolean verifyPassword(String email, String currentPassword);
 
-    String generateToken(String email);
+    UserLogin generateToken(String email);
 
     boolean changeUserPassword(Long userId, UserChangePasswordRequest userChangePasswordRequest);
 

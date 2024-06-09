@@ -13,4 +13,8 @@ public interface CartDeliveredRepository {
     void insert(Optional<CartModel> cartModel);
 
     List<CartDeliveredModel> findCartsDeliveredByUserId(Long userId);
+
+    List<CartDeliveredEntity> findAll();
+
+    List<CartDeliveredModel> findAllOrders();
 }

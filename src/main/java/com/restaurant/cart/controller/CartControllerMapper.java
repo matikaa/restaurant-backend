@@ -1,7 +1,10 @@
 package com.restaurant.cart.controller;
 
 import com.restaurant.cart.controller.dto.CartResponse;
+import com.restaurant.cart.controller.dto.CartResponseDelivered;
+import com.restaurant.cart.controller.dto.SoldFoodSummaryResponse;
 import com.restaurant.cart.service.current.dto.Cart;
+import com.restaurant.cart.service.current.dto.SoldFoodSummary;
 import com.restaurant.cart.service.delivered.dto.CartDelivered;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -15,11 +18,13 @@ public interface CartControllerMapper {
 
     CartResponse cartToCartResponse(Cart cart);
 
-    default List<CartResponse> cartDeliveredToCartDeliveredResponse(List<CartDelivered> cartDelivered) {
+    default List<CartResponseDelivered> cartDeliveredsToCartResponseDelivereds(List<CartDelivered> cartDelivered) {
         return cartDelivered.stream()
-                .map(this::cartDeliveredToCartDeliveredResponse)
+                .map(this::cartDeliveredToCartResponseDelivered)
                 .toList();
     }
 
-    CartResponse cartDeliveredToCartDeliveredResponse(CartDelivered cartDelivered);
+    CartResponseDelivered cartDeliveredToCartResponseDelivered(CartDelivered cartDelivered);
+
+    List<SoldFoodSummaryResponse> soldFoodSummaryToSoldFoodSummaryResponse(List<SoldFoodSummary> overallSoldFood);
 }

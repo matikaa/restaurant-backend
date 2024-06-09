@@ -18,4 +18,4 @@ INSERT INTO CONTACT_ENTITY(CONTACT_MAIL,
                            ADDRESS_CITY,
                            ADDRESS_STREET,
                            ADDRESS_NUMBER)
-VALUES('company@temp.com', '509283543', 'monday-saturday', '9.00', '22.00', 'Warsaw', 'Golden Street', 32);
+VALUES('m&m_restaurant@o2.pl', '509283543', 'Monday-Saturday', '9.00', '22.00', 'Warsaw', 'Golden Street', 32);

@@ -1,5 +1,6 @@
 package com.restaurant.cart.service.delivered.dto;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public record CartDelivered(
@@ -8,6 +9,7 @@ public record CartDelivered(
         Boolean loyaltyCard,
         Double cartValue,
         List<String> food,
-        List<Double> foodPrice
+        List<Double> foodPrice,
+        ZonedDateTime orderDate
 ) {
 }

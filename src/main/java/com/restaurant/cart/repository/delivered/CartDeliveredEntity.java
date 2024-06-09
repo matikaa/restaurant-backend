@@ -4,6 +4,7 @@ import com.restaurant.cart.repository.converter.FoodNameConverter;
 import com.restaurant.cart.repository.converter.FoodPriceConverter;
 import jakarta.persistence.*;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,22 @@ public class CartDeliveredEntity {
     @Column
     @Convert(converter = FoodPriceConverter.class)
     private List<Double> foodPrice = new ArrayList<>();
+
+    private ZonedDateTime orderDate;
+
+    public CartDeliveredEntity(Long userId, Boolean loyaltyCard, Double cartValue, List<String> food,
+                               List<Double> foodPrice, ZonedDateTime orderDate) {
+        this.userId = userId;
+        this.loyaltyCard = loyaltyCard;
+        this.cartValue = cartValue;
+        this.food = food;
+        this.foodPrice = foodPrice;
+        this.orderDate = orderDate;
+    }
+
+    public CartDeliveredEntity() {
+
+    }
 
     public Long getCartId() {
         return cartId;
@@ -77,5 +94,13 @@ public class CartDeliveredEntity {
 
     public void setFoodPrice(List<Double> foodPrice) {
         this.foodPrice = foodPrice;
+    }
+
+    public ZonedDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(ZonedDateTime orderDate) {
+        this.orderDate = orderDate;
     }
 }

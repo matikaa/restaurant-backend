@@ -2,6 +2,8 @@ package com.restaurant.cart.controller;
 
 import com.restaurant.cart.controller.dto.CartDeliveredResponse;
 import com.restaurant.cart.controller.dto.CartResponse;
+import com.restaurant.cart.controller.dto.CartStatisticResponse;
+import com.restaurant.cart.controller.dto.OrderDate;
 import com.restaurant.cart.service.current.CartService;
 import com.restaurant.cart.service.current.dto.Cart;
 import com.restaurant.common.ConstantValues;
@@ -129,6 +131,24 @@ public class CartController {
                 });
     }
 
+    @GetMapping("/users/{userId}/cart/order_in_delivery")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<CartResponse> getInDeliveryUserOrder(@PathVariable Long userId) {
+        var user = userService.getUserById(userId);
+        if (user.isEmpty()) {
+            LOGGER.warn(ConstantValues.NO_ACCESS);
+            return ResponseEntity.status(FORBIDDEN).build();
+        }
+
+        return cartService.getInDeliveryCart(userId)
+                .map(cartControllerMapper::cartToCartResponse)
+                .map(result -> ResponseEntity.ok().body(result))
+                .orElseGet(() -> {
+                    LOGGER.warn(ConstantValues.EMPTY_CART);
+                    return ResponseEntity.status(CONFLICT).build();
+                });
+    }
+
     @GetMapping("/users/{userId}/order")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<CartDeliveredResponse> getAllUserOrders(@PathVariable Long userId) {
@@ -140,8 +160,17 @@ public class CartController {
 
         return ResponseEntity.ok().body(
                 new CartDeliveredResponse(cartService.getOverallCartValue(userId),
-                        cartControllerMapper.cartDeliveredToCartDeliveredResponse(
+                        cartControllerMapper.cartDeliveredsToCartResponseDelivereds(
                                 cartService.getAllDeliveredCart(userId)).stream().toList()));
+    }
+
+    @PostMapping("/orders")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<CartStatisticResponse> getAllSortedAndSoldFood(@RequestBody OrderDate orderDate) {
+        return ResponseEntity.ok().body(new CartStatisticResponse(
+                cartService.getValueOfAllOrders(orderDate), cartControllerMapper.soldFoodSummaryToSoldFoodSummaryResponse(
+                        cartService.getOverallSoldFood(orderDate))
+        ));
     }
 
     @DeleteMapping("/users/{userId}/cart/order")

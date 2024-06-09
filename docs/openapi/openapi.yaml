@@ -26,7 +26,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  Categories:
+                  categoryResponses:
                     type: array
                     items:
                       $ref: '#/components/schemas/CategoryResponse'
@@ -166,7 +166,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  Food:
+                  foodResponses:
                     type: array
                     items:
                       $ref: '#/components/schemas/FoodResponse'
@@ -210,6 +210,29 @@ paths:
           description: User does not have permissions to access that resource
         '404':
           description: Category or food was not found
+
+  /categories/food:
+    post:
+      tags:
+        - food
+      summary: Get food related to name
+      description: |
+        Get food by food name
+
+      operationId: getFoodByFoodName
+      requestBody:
+        description: Request body to find food by name and price
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FoodNameAndPrice'
+      responses:
+        '200':
+          description: Food was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodResponse'
 
   /categories/{categoryId}/food/{foodId}:
     get:
@@ -328,7 +351,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  Users:
+                  userResponses:
                     type: array
                     items:
                       $ref: '#/components/schemas/UserResponse'
@@ -444,6 +467,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: User not exists
+
+  /users/{userId}/role:
+    get:
+      tags:
+        - users
+      summary: Get single user role
+      description: |
+        **Get single user role**
+        
+        Allowed roles: ```ADMIN```, ```USER```
+      operationId: getUserRole
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: User was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRole'
         '403':
           description: User does not have permissions to access that resource
         '404':
@@ -604,6 +656,34 @@ paths:
       responses:
         '200':
           description: User was updated successfully
+        '403':
+          description: User does not have permissions to access that resource
+        '404':
+          description: User not exists
+
+    get:
+      tags:
+        - users
+      summary: Get single user balance account
+      description: |
+        **Get single user**
+        
+        Allowed roles: ```ADMIN```, ```USER```
+      operationId: getCurrentUserBalance
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: User was fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserMoney'
         '403':
           description: User does not have permissions to access that resource
         '404':
@@ -901,6 +981,55 @@ paths:
         '409':
           description: There is not order to delete
 
+  /users/{userId}/cart/order_in_delivery:
+    get:
+      tags:
+        - cart
+      summary: Get in delivery order
+      description: |
+        Get in delivery user's order
+
+        Allowed roles: ```ADMIN```,```USER```
+      operationId: getInDeliveryUserOrder
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: ID of the user
+      responses:
+        '200':
+          description: Order was successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '403':
+          description: User does not have permissions to access that resource
+        '409':
+          description: Cart is empty
+
+  /orders:
+    get:
+      tags:
+        - cart
+      summary: Get all done orders
+      description: |
+        Get all done orders
+
+        Allowed roles: ```ADMIN```
+      operationId: getAllSortedAndSoldFood
+      responses:
+        '200':
+          description: Orders were successfully fetched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartStatisticResponse'
+        '403':
+          description: User does not have permissions to access that resource
+
   /users/{userId}/order:
     get:
       tags:
@@ -1000,6 +1129,17 @@ components:
           items:
             $ref: '#/components/schemas/CartResponse'
 
+    CartStatisticResponse:
+      type: object
+      properties:
+        value:
+          type: number
+          example: 60
+        soldFoodSummaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/SoldFoodSummaryResponse'
+
     CartResponse:
       type: object
       properties:
@@ -1016,6 +1156,31 @@ components:
           items:
             type: number
             example: 54
+
+    SoldFoodSummaryResponse:
+      type: object
+      properties:
+        foodName:
+          type: string
+          example: "Bruschetta"
+        price:
+          type: integer
+          example: 20
+        quantitySold:
+          type: integer
+          example: 3
+        totalValue:
+          type: integer
+          example: 60
+        categoryId:
+          type: integer
+          example: 2
+        categoryName:
+          type: string
+          example: "Starters"
+        positionId:
+          type: integer
+          example: 1
 
     ContactResponse:
       type: object
@@ -1176,6 +1341,9 @@ components:
     LoginRequestResponse:
       type: object
       properties:
+        userId:
+          type: integer
+          example: 1
         token:
           type: string
           example: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYXpAYWRtaW4ucGwiLCJpYXQiOjE2OTQ3MTk2NjYsImV4cCI6MTY5NDcyMTQ2Nn0.Xy_BHY2pbctM3GfWKywEkRJDJiO4Jq8-84H-ZSETGps'
@@ -1225,6 +1393,13 @@ components:
           format: int64
           example: 3
 
+    UserRole:
+      type: object
+      properties:
+        role:
+          type: string
+          example: 'USER'
+
     FoodResponse:
       type: object
       properties:
@@ -1259,6 +1434,17 @@ components:
           example: 'French fries'
         foodPrice:
           type: integer
+          example: 12
+
+    FoodNameAndPrice:
+      type: object
+      properties:
+        foodName:
+          type: string
+          example: 'French fries'
+        foodPrice:
+          type: integer
+          format: int64
           example: 12
 
     FoodRequestUpdate:

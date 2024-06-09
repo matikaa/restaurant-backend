@@ -1,11 +1,11 @@
 package com.restaurant.user.service;
 
-import com.restaurant.user.controller.dto.*;
 import com.restaurant.common.ConstantValues;
 import com.restaurant.jwt.service.JwtService;
 import com.restaurant.user.controller.dto.*;
 import com.restaurant.user.repository.UserRepository;
 import com.restaurant.user.service.dto.User;
+import com.restaurant.user.service.dto.UserLogin;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -94,8 +94,14 @@ public class BaseUserService implements UserService {
     }
 
     @Override
-    public String generateToken(String email) {
-        return jwtService.generateToken(email);
+    public UserLogin generateToken(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            return null;
+        }
+
+        var userId = userRepository.findByEmail(email).get().userId();
+        var token = jwtService.generateToken(email);
+        return new UserLogin(userId, token);
     }
 
     @Override

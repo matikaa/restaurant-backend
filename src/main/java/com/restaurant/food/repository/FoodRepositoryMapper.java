@@ -16,7 +16,7 @@ public interface FoodRepositoryMapper {
 
     FoodModel foodEntityToFoodModel(FoodEntity foodEntity);
 
-    List<FoodModel> foodEntityToFoodModels(List<FoodEntity> foodEntities);
+    List<FoodModel> foodEntitiesToFoodModels(List<FoodEntity> foodEntities);
 
     FoodEntity foodModelToFoodEntity(FoodModel foodModel);
 }
