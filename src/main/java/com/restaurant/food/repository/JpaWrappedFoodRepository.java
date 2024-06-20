@@ -24,7 +24,7 @@ public class JpaWrappedFoodRepository implements FoodRepository {
 
     @Override
     public List<FoodModel> getFoodByCategoryId(Long categoryId) {
-        return foodRepositoryMapper.foodEntityToFoodModels(foodJpaRepository.getFoodByCategoryId(categoryId));
+        return foodRepositoryMapper.foodEntitiesToFoodModels(foodJpaRepository.getFoodByCategoryId(categoryId));
     }
 
     public boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId) {
@@ -45,8 +45,24 @@ public class JpaWrappedFoodRepository implements FoodRepository {
     }
 
     @Override
+    public Optional<FoodModel> getFoodByFoodNameAndFoodPrice(String foodName, Double foodPrice) {
+        return foodJpaRepository.getFoodByFoodNameAndFoodPrice(foodName, foodPrice)
+                .map(foodRepositoryMapper::foodEntityToFoodModel);
+    }
+
+    @Override
     public Optional<FoodModel> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId) {
         return foodJpaRepository.getFoodByCategoryIdAndFoodId(categoryId, foodId)
                 .map(foodRepositoryMapper::foodEntityToFoodModel);
+    }
+
+    @Override
+    public List<FoodModel> getFood() {
+        return foodRepositoryMapper.foodEntitiesToFoodModels(foodJpaRepository.findAll());
+    }
+
+    @Override
+    public void deleteByCategoryId(Long categoryId) {
+        foodJpaRepository.deleteByCategoryId(categoryId);
     }
 }

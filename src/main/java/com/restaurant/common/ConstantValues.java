@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 
 public class ConstantValues {
 
-    public static final long TIME = 1000 * (long) 60 * 30;
+    public static final long TIME = 1000 * (long) 60 * 60 * 5;
     public static final Double DISCOUNT = 0.1D;
     public static final Double DELIVERY_PRICE = 10D;
     public static final DecimalFormat format = new DecimalFormat("0.00");

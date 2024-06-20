@@ -95,8 +95,10 @@ public class AppConfig {
     }
 
     @Bean
-    public CartDeliveredService cartDeliveredServiceInterface(CartDeliveredJpaRepository cartDeliveredJpaRepository) {
-        return new BaseCartDeliveredService(cartDeliveredRepositoryInterface(cartDeliveredJpaRepository));
+    public CartDeliveredService cartDeliveredServiceInterface(CartDeliveredJpaRepository cartDeliveredJpaRepository,
+                                                              FoodService foodService, CategoryService categoryService) {
+        return new BaseCartDeliveredService(cartDeliveredRepositoryInterface(cartDeliveredJpaRepository),
+                foodService, categoryService);
     }
 
     private CartDeliveredRepository cartDeliveredRepositoryInterface(
@@ -105,7 +107,8 @@ public class AppConfig {
     }
 
     @Bean
-    public CartService cartServiceInterface(CartJpaRepository cartJpaRepository, CartDeliveredService cartDeliveredService) {
+    public CartService cartServiceInterface(CartJpaRepository cartJpaRepository,
+                                            CartDeliveredService cartDeliveredService) {
         return new BaseCartService(cartRepositoryInterface(cartJpaRepository), cartDeliveredService);
     }
 

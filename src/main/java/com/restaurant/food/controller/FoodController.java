@@ -42,6 +42,14 @@ public class FoodController {
                         foodService.getFoodByCategoryId(categoryId).stream().toList())));
     }
 
+    @PostMapping("/food")
+    public ResponseEntity<FoodResponse> getFoodByFoodName(@RequestBody FoodNameAndPrice foodNameAndPrice) {
+        return foodService.getFoodByNameAndPrice(foodNameAndPrice.foodName(), foodNameAndPrice.foodPrice())
+                .map(foodControllerMapper::foodToFoodResponse)
+                .map(food -> ResponseEntity.ok().body(food))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{categoryId}/food/{foodId}")
     public ResponseEntity<FoodResponse> getFoodByCategoryIdAndFoodId(@PathVariable Long categoryId,
                                                                      @PathVariable Long foodId) {

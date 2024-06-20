@@ -3,6 +3,7 @@ package com.restaurant.cart.repository.delivered;
 import com.restaurant.cart.repository.current.dto.CartModel;
 import com.restaurant.cart.repository.delivered.dto.CartDeliveredModel;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +19,25 @@ public class JpaWrappedCartDeliveredRepository implements CartDeliveredRepositor
 
     @Override
     public void insert(Optional<CartModel> cartModel) {
-        cartModel.ifPresent(model -> cartDeliveredJpaRepository.save(
-                cartDeliveredRepositoryMapper.cartModelToCartDeliveredEntity(model)
+        cartModel.ifPresent(model -> cartDeliveredJpaRepository.save(setOrderDate(
+                cartDeliveredRepositoryMapper.cartModelToCartDeliveredEntity(model))
         ));
+    }
+
+    public CartDeliveredEntity setOrderDate(CartDeliveredEntity cartDeliveredEntity) {
+        cartDeliveredEntity.setOrderDate(ZonedDateTime.now());
+        return cartDeliveredEntity;
+    }
+
+    @Override
+    public List<CartDeliveredEntity> findAll() {
+        return cartDeliveredJpaRepository.findAll();
+    }
+
+    @Override
+    public List<CartDeliveredModel> findAllOrders() {
+        return cartDeliveredRepositoryMapper.cartDeliveredEntitiesToCartDeliveredModels(
+                cartDeliveredJpaRepository.findAll());
     }
 
     @Override

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS USER_ENTITY(
 INSERT INTO USER_ENTITY(EMAIL, NAME, PASSWORD, CREATED_TIME, ROLE, ADDRESS, PHONE_NUMBER, MONEY, LOYALTY_CARD)
 VALUES('mati@admin.pl',
        'Mateusz',
-       '$2a$10$oAZsPAzZ0t4cFncm.hbacOKMKZfIDqswmYxM1eaum15bSuYjyJSxK',
+       '$2a$10$cYyOJs2ZPlKToiyRh8MqyOQcmkMpE.j7Tms1z1wvZyA7UwGVrPs8i',
        '2023-07-26T13:50:34',
        'ADMIN',
        'ul. Aleje politechniki 13, 90-507 Lodz',

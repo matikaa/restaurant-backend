@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;
@@ -40,6 +41,17 @@ public class UserController {
                         userService.getAll()).stream().toList()));
     }
 
+    @GetMapping("/me")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<UserResponse> getUserByContext() {
+        var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return userService.getUserByEmail(userEmail)
+                .map(userControllerMapper::userToUserResponse)
+                .map(foundUser -> ResponseEntity.ok().body(foundUser))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{userId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long userId) {
@@ -50,6 +62,29 @@ public class UserController {
 
         return userService.getUserById(userId)
                 .map(userControllerMapper::userToUserResponse)
+                .map(foundUser -> ResponseEntity.ok().body(foundUser))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{userId}/role")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<UserRole> getUserRole(@PathVariable Long userId) {
+        if (!userService.existsByUserId(userId)) {
+            LOGGER.warn(ConstantValues.USER_NOT_EXISTS);
+            return ResponseEntity.notFound().build();
+        }
+
+        return userService.getUserById(userId)
+                .map(userControllerMapper::userToUserRole)
+                .map(foundUser -> ResponseEntity.ok().body(foundUser))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{userId}/balance")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public ResponseEntity<UserMoney> getCurrentUserBalance(@PathVariable Long userId) {
+        return userService.getUserById(userId)
+                .map(userControllerMapper::userToUserMoney)
                 .map(foundUser -> ResponseEntity.ok().body(foundUser))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -84,7 +119,7 @@ public class UserController {
 
         if (userService.verifyAndLogUser(loginRequest)) {
             return ResponseEntity.ok().body(
-                    userControllerMapper.stringToLoginRequestResponse(
+                    userControllerMapper.userLoginToLoginRequestResponse(
                             userService.generateToken(loginRequest.email())));
         } else {
             LOGGER.warn(ConstantValues.INCORRECT_LOG_DATA);
@@ -134,6 +169,7 @@ public class UserController {
             LOGGER.warn(ConstantValues.INVALID_REQUEST_BODY);
             return ResponseEntity.badRequest().build();
         }
+
         var userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!userService.existsUserByEmail(userEmail)) {
             LOGGER.warn(ConstantValues.NO_ACCESS);
@@ -163,7 +199,6 @@ public class UserController {
 
         return ResponseEntity.ok().build();
     }
-
 
     @PutMapping("/me/password")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
@@ -208,12 +243,16 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/balance")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public ResponseEntity<Void> changeAnyUserAccountBalance(@PathVariable Long userId,
-                                                            @RequestBody UserMoney userMoney) {
+                                                            @RequestBody @Validated UserMoney userMoney) {
         if (!userService.existsByUserId(userId)) {
             LOGGER.warn(ConstantValues.USER_NOT_EXISTS);
             return ResponseEntity.notFound().build();
+        }
+
+        if(userMoney.money() <= 0) {
+            return ResponseEntity.badRequest().build();
         }
 
         userService.updateUserBalance(userId, userMoney);

@@ -4,7 +4,9 @@ import com.restaurant.cart.repository.current.dto.CartModel;
 import com.restaurant.common.ConstantValues;
 import com.restaurant.common.Status;
 import com.restaurant.food.service.dto.Food;
+import jakarta.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,11 +79,19 @@ public class JpaWrappedCartRepository implements CartRepository {
         cartJpaRepository.deleteByUserId(userId);
     }
 
+    @Transactional
     @Override
     public void deleteSpecificOrder(Long userId, Food food) {
         cartJpaRepository.findCartEntityByUserId(userId)
-                .map(cart -> deleteSpecificFood(cart, food))
-                .map(cartJpaRepository::save);
+                .map(cart -> {
+                    deleteSpecificFood(cart, food);
+                    if (cart.getFood().isEmpty()) {
+                        cartJpaRepository.delete(cart);
+                    } else {
+                        cartJpaRepository.save(cart);
+                    }
+                    return cart;
+                });
     }
 
     @Override
@@ -123,10 +133,16 @@ public class JpaWrappedCartRepository implements CartRepository {
         cartEntity.setLoyaltyCard(loyaltyCard);
 
         List<String> foodList = cartEntity.getFood();
+        if(foodList.isEmpty()) {
+            foodList = new ArrayList<>();
+        }
         foodList.add(food.foodName());
         cartEntity.setFood(foodList);
 
         List<Double> foodPriceList = cartEntity.getFoodPrice();
+        if(foodPriceList.isEmpty()) {
+            foodPriceList = new ArrayList<>();
+        }
         foodPriceList.add(ConstantValues.my_format(food.foodPrice()));
         cartEntity.setFoodPrice(foodPriceList);
 

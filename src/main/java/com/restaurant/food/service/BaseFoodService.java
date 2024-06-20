@@ -33,6 +33,12 @@ public class BaseFoodService implements FoodService {
     }
 
     @Override
+    public Optional<Food> getFoodByNameAndPrice(String foodName, Double foodPrice) {
+        return foodRepository.getFoodByFoodNameAndFoodPrice(foodName, foodPrice)
+                .map(foodServiceMapper::foodModelToFood);
+    }
+
+    @Override
     public boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId) {
         return foodRepository.existsByCategoryIdAndFoodId(categoryId, foodId);
     }
@@ -52,5 +58,10 @@ public class BaseFoodService implements FoodService {
     public Optional<Food> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId) {
         return foodRepository.getFoodByCategoryIdAndFoodId(categoryId, foodId)
                 .map(foodServiceMapper::foodModelToFood);
+    }
+
+    @Override
+    public void deleteByCategoryId(Long categoryId) {
+        foodRepository.deleteByCategoryId(categoryId);
     }
 }

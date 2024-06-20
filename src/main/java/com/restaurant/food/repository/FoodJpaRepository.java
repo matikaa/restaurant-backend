@@ -12,4 +12,8 @@ public interface FoodJpaRepository extends JpaRepository<FoodEntity, Long> {
     Optional<FoodEntity> getFoodByCategoryIdAndFoodId(Long categoryId, Long foodId);
 
     boolean existsByCategoryIdAndFoodId(Long categoryId, Long foodId);
+
+    Optional<FoodEntity> getFoodByFoodNameAndFoodPrice(String foodName, Double foodPrice);
+
+    void deleteByCategoryId(Long categoryId);
 }
